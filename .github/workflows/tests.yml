@@ -86,4 +86,20 @@ jobs:
           GIJ_PIN: ${{ secrets.GIJ_PIN }}
           BASE_URL: ${{ vars.BASE_URL }}
           EXECUTABLE_PATH: ${{ steps.chrome.outputs.path }}
-        run: node e2e.js
+        run: |
+          set -o pipefail
+          node e2e.js 2>&1 | tee /tmp/e2e-output.log
+
+      # api.github.com sahaja boleh dicapai dari luar CI (bukan storan
+      # blob log runner), jadi bila gagal, hantar ekor log ke Gist
+      # peribadi supaya boleh dibaca terus melalui API.
+      - name: Muat naik log ralat ke Gist (jika gagal)
+        if: failure()
+        run: |
+          TAIL=$(tail -c 55000 /tmp/e2e-output.log | python3 -c "import json,sys; print(json.dumps(sys.stdin.read()))")
+          BODY=$(printf '{"description":"Log ralat e2e-supabase - run %s","public":false,"files":{"e2e-output.log":{"content":%s}}}' "${{ github.run_id }}" "$TAIL")
+          RESP=$(curl -sS -X POST https://api.github.com/gists \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            -d "$BODY")
+          echo "$RESP" | python3 -c "import json,sys; d=json.load(sys.stdin); print('GIST_URL:', d.get('html_url'), d.get('url'))"
