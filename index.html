@@ -1,0 +1,2405 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#046c4e">
+<title>Ganjaran Ilmu Jemaah Masjid</title>
+<meta name="description" content="Ganjaran Ilmu Jemaah Masjid — hadir, dengar khutbah, jawab soalan, menang cabutan. Penyertaan adalah percuma.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Penjana QR (qrcodejs) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+/* =====================================================================
+   1. TOKEN WARNA & TEMA — putih/hijau zamrud + emas lembut, kontras tinggi
+   ===================================================================== */
+:root {
+  --font: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --bg: #fbfdfc;
+  --surface: #ffffff;
+  --surface-2: #f1f6f3;
+  --text: #06140f;
+  --muted: #34473f;
+  --border: #cfdcd4;
+  --primary: #046c4e;
+  --primary-hover: #065f46;
+  --primary-soft: #d9f4e7;
+  --on-primary: #ffffff;
+  --gold: #7d5e17;
+  --gold-bright: #d4af5f;
+  --gold-soft: #f8f0da;
+  --danger: #a01b12;
+  --danger-soft: #fde2df;
+  --warn: #8a3a05;
+  --warn-soft: #fef0c7;
+  --shadow-sm: 0 1px 2px rgba(6, 40, 30, .06);
+  --shadow: 0 10px 30px -14px rgba(6, 40, 30, .25);
+  --shadow-lg: 0 28px 70px -24px rgba(6, 40, 30, .4);
+  --radius: 20px;
+  --tap: 56px;             /* tinggi minimum butang (mesra warga emas) */
+  --c-new: #c69c47;
+  --c-reg: #047857;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #04110c; --surface: #0b1e17; --surface-2: #122b22;
+    --text: #f2faf6; --muted: #bdd0c8; --border: #2a4a3d;
+    --primary: #2fd39b; --primary-hover: #5ee3b5; --primary-soft: #0f3a2c; --on-primary: #02130c;
+    --gold: #f0cf7e; --gold-bright: #f0d18a; --gold-soft: #2f2715;
+    --danger: #ff8f86; --danger-soft: #3f1715; --warn: #ffd166; --warn-soft: #3a2c0b;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.4); --shadow: 0 12px 30px -12px rgba(0,0,0,.6); --shadow-lg: 0 30px 70px -20px rgba(0,0,0,.75);
+    --c-new: #f0cf7e; --c-reg: #2fd39b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #04110c; --surface: #0b1e17; --surface-2: #122b22;
+  --text: #f2faf6; --muted: #bdd0c8; --border: #2a4a3d;
+  --primary: #2fd39b; --primary-hover: #5ee3b5; --primary-soft: #0f3a2c; --on-primary: #02130c;
+  --gold: #f0cf7e; --gold-bright: #f0d18a; --gold-soft: #2f2715;
+  --danger: #ff8f86; --danger-soft: #3f1715; --warn: #ffd166; --warn-soft: #3a2c0b;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.4); --shadow: 0 12px 30px -12px rgba(0,0,0,.6); --shadow-lg: 0 30px 70px -20px rgba(0,0,0,.75);
+  --c-new: #f0cf7e; --c-reg: #2fd39b;
+  color-scheme: dark;
+}
+
+/* =====================================================================
+   2. ASAS — fon asas 18px (1rem = 18px)
+   ===================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; font-size: 112.5%; }
+body {
+  margin: 0; font-family: var(--font); font-size: 1rem; line-height: 1.55;
+  background: var(--bg); color: var(--text); min-height: 100vh;
+  transition: background-color .3s ease, color .3s ease;
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+}
+h1, h2, h3 { line-height: 1.2; margin: 0 0 .4em; letter-spacing: -.02em; }
+h1 { font-size: clamp(1.45rem, 4vw, 2rem); font-weight: 800; }
+h2 { font-size: 1.28rem; font-weight: 800; }
+h3 { font-size: 1.08rem; font-weight: 700; }
+p { margin: 0 0 .8em; }
+a { color: var(--primary); }
+button, input, select, textarea { font: inherit; color: inherit; }
+.muted { color: var(--muted); }
+.small { font-size: .9rem; }
+.center { text-align: center; }
+.hidden { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+:focus-visible { outline: 3px solid var(--gold-bright); outline-offset: 2px; border-radius: 6px; }
+
+/* Header ringkas (tiada nav untuk jemaah) */
+.topbar { position: sticky; top: 0; z-index: 40; background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+.topbar-inner { max-width: 1160px; margin: 0 auto; display: flex; align-items: center; gap: 10px; padding: 8px 16px; }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; text-decoration: none; color: var(--text); min-height: var(--tap); }
+.brand-mark { width: 42px; height: 42px; flex: none; border-radius: 12px; display: grid; place-items: center; background: linear-gradient(135deg, #065f46, #047857); box-shadow: inset 0 0 0 1.5px rgba(212,175,95,.55); }
+.brand-text { min-width: 0; }
+.brand-title { display: block; font-weight: 800; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brand-sub { display: block; font-size: .8rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.icon-btn { width: var(--tap); height: var(--tap); flex: none; border-radius: 14px; border: 1.5px solid var(--border); background: var(--surface); display: grid; place-items: center; cursor: pointer; transition: transform .2s, background .2s; }
+.icon-btn:hover { transform: translateY(-1px); background: var(--surface-2); }
+.icon-btn svg { width: 24px; height: 24px; }
+body.mode-skrin .topbar, body.mode-skrin footer { display: none; }
+.demo-pill { font-size: .72rem; font-weight: 800; padding: 3px 9px; border-radius: 999px; background: var(--warn-soft); color: var(--warn); white-space: nowrap; }
+
+main { position: relative; z-index: 1; max-width: 1160px; margin: 0 auto; padding: 20px 16px 28px; }
+body.mode-skrin main { max-width: none; padding: 0; }
+footer.foot { text-align: center; font-size: .88rem; color: var(--muted); padding: 10px 16px 24px; }
+.fade-up { animation: fadeUp .45s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* Komponen asas */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-sm); min-width: 0; }
+.card + .card { margin-top: 14px; }
+.card.accent { border-top: 4px solid var(--gold-bright); }
+.card-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.card-title h2, .card-title h3 { margin: 0; }
+.grid { display: grid; gap: 14px; }
+.grid > * { min-width: 0; }
+.grid > .card + .card { margin-top: 0; }
+@media (min-width: 700px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+.page-head { margin: 4px 0 18px; }
+.eyebrow { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; color: var(--gold); margin-bottom: 6px; }
+.head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: var(--tap); padding: 12px 20px; border-radius: 14px; border: 1.5px solid transparent; font-weight: 700; font-size: 1rem; cursor: pointer; text-decoration: none; line-height: 1.2; text-align: center; transition: transform .15s, background .2s, opacity .2s, box-shadow .2s; -webkit-tap-highlight-color: transparent; }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: scale(.98); }
+.btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.btn svg { width: 20px; height: 20px; flex: none; }
+.btn-primary { background: var(--primary); color: var(--on-primary); box-shadow: 0 6px 18px -8px var(--primary); }
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-gold { background: linear-gradient(135deg, #e2c07a, #c69c47); color: #241a03; box-shadow: 0 6px 18px -8px #c69c47; }
+.btn-ghost { background: var(--surface); border-color: var(--border); color: var(--text); }
+.btn-ghost:hover { background: var(--surface-2); }
+.btn-danger { background: var(--danger-soft); color: var(--danger); border-color: color-mix(in srgb, var(--danger) 30%, transparent); }
+.btn-wa { background: #25d366; color: #032b15; }
+.btn-sm { padding: 8px 14px; font-size: .9rem; }
+.btn-lg { padding: 16px 26px; font-size: 1.1rem; min-height: 64px; }
+.btn-block { width: 100%; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn-row.center { justify-content: center; }
+.link-btn { background: none; border: 0; color: var(--primary); text-decoration: underline; cursor: pointer; font-size: .95rem; padding: 4px 8px; min-height: var(--tap); font-weight: 600; }
+
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; min-width: 0; }
+.field label { font-weight: 700; font-size: .95rem; }
+.input, .field input, .field select, .field textarea { width: 100%; min-height: var(--tap); padding: 12px 14px; border-radius: 12px; border: 2px solid var(--border); background: var(--surface-2); font-size: 1rem; transition: border-color .2s, box-shadow .2s, background .2s; }
+.input:focus, .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 20%, transparent); }
+.field textarea, textarea.input { resize: vertical; min-height: 100px; }
+.field.invalid input { border-color: var(--danger); }
+.field .error { font-size: .92rem; color: var(--danger); font-weight: 700; }
+.hint { font-size: .88rem; color: var(--muted); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+.row > .field { flex: 1 1 140px; }
+.check { display: flex; align-items: center; gap: 10px; min-height: var(--tap); cursor: pointer; font-weight: 600; }
+.check input { width: 24px; height: 24px; accent-color: var(--primary); }
+
+.note { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; font-size: .95rem; background: var(--gold-soft); border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent); }
+.note svg { width: 22px; height: 22px; flex: none; margin-top: 1px; color: var(--gold); }
+.note.warn { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+.note.warn svg { color: var(--warn); }
+.note.ok { background: var(--primary-soft); border-color: color-mix(in srgb, var(--primary) 35%, transparent); }
+.note.ok svg { color: var(--primary); }
+.free-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 999px; background: var(--primary-soft); color: var(--primary); font-weight: 800; font-size: .9rem; }
+
+.badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; font-size: .78rem; font-weight: 700; background: var(--surface-2); color: var(--muted); border: 1px solid var(--border); white-space: nowrap; }
+.badge.ok { background: var(--primary-soft); color: var(--primary); border-color: transparent; }
+.badge.draft { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+.badge.live { background: var(--primary-soft); color: var(--primary); border-color: transparent; }
+.badge.live::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse 1.4s infinite; }
+.streak { display: inline-flex; align-items: center; gap: 4px; padding: 3px 11px; border-radius: 999px; font-size: .85rem; font-weight: 800; white-space: nowrap; background: #ffe7c2; color: #6b3300; }
+:root[data-theme="dark"] .streak { background: #4a2a06; color: #ffcf8a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .streak { background: #4a2a06; color: #ffcf8a; } }
+.medal-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 11px; border-radius: 999px; font-size: .82rem; font-weight: 800; background: var(--gold-soft); color: var(--gold); white-space: nowrap; }
+.badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
+td .badges { justify-content: flex-start; margin-top: 4px; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+
+/* =====================================================================
+   3. UI JEMAAH (#j) — satu skrin pada satu masa
+   ===================================================================== */
+.jwrap { max-width: 540px; margin: 0 auto; min-height: calc(100vh - 170px); display: flex; flex-direction: column; justify-content: center; gap: 16px; }
+.jscreen { text-align: center; padding: 30px 20px; }
+.jscreen h1 { font-size: 1.7rem; }
+.jscreen p { color: var(--muted); font-size: 1.05rem; }
+.big-icon { width: 96px; height: 96px; margin: 0 auto 16px; border-radius: 30px; display: grid; place-items: center; background: var(--primary-soft); color: var(--primary); }
+.big-icon svg { width: 48px; height: 48px; }
+.big-icon.gold { background: var(--gold-soft); color: var(--gold); }
+.hourglass svg { animation: flip 2.4s ease-in-out infinite; }
+@keyframes flip { 0%, 40% { transform: rotate(0); } 50%, 90% { transform: rotate(180deg); } 100% { transform: rotate(360deg); } }
+.session-chip { display: inline-block; padding: 6px 14px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); font-weight: 700; font-size: .95rem; margin-bottom: 14px; }
+.ticket-count { display: inline-flex; align-items: center; gap: 12px; margin: 6px 0 4px; font-size: 3.6rem; font-weight: 800; letter-spacing: -.04em; color: var(--gold); }
+.ticket-count svg { width: 50px; height: 50px; color: var(--gold-bright); }
+.dots { display: inline-flex; gap: 6px; margin-top: 10px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--primary); animation: pulse 1.2s infinite; }
+.dots i:nth-child(2) { animation-delay: .2s; } .dots i:nth-child(3) { animation-delay: .4s; }
+
+.timer-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 16px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm); font-weight: 700; }
+.timer-bar .time { font-weight: 800; font-variant-numeric: tabular-nums; font-size: 1.3rem; color: var(--primary); }
+.timer-bar.urgent .time { color: var(--danger); animation: pulse 1s infinite; }
+.progress { height: 10px; border-radius: 10px; background: var(--surface-2); overflow: hidden; border: 1px solid var(--border); }
+.progress > i { display: block; height: 100%; background: linear-gradient(90deg, var(--primary), var(--gold-bright)); transition: width .4s ease; }
+.q-text { font-size: 1.25rem; line-height: 1.45; margin-bottom: 18px; }
+.opts { display: grid; gap: 12px; }
+.opt { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; padding: 12px 16px; text-align: left; cursor: pointer; border: 2px solid var(--border); border-radius: 16px; background: var(--surface-2); font-size: 1.05rem; font-weight: 600; transition: border-color .2s, background .2s, transform .15s; }
+.opt:hover { border-color: color-mix(in srgb, var(--primary) 55%, var(--border)); }
+.opt:active { transform: scale(.99); }
+.opt-key { flex: none; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; background: var(--surface); border: 2px solid var(--border); transition: all .2s; }
+.opt.sel { border-color: var(--primary); background: var(--primary-soft); }
+.opt.sel .opt-key { background: var(--primary); color: var(--on-primary); border-color: var(--primary); transform: scale(1.06); }
+.nav-row { display: flex; gap: 10px; }
+.nav-row .btn { flex: 1; }
+.review-item { padding: 12px 0; border-bottom: 1px dashed var(--border); text-align: left; }
+.review-item:last-child { border-bottom: 0; }
+.ok-text { color: var(--primary); font-weight: 800; }
+.bad-text { color: var(--danger); font-weight: 800; }
+.points { margin: 0; padding-left: 1.2em; text-align: left; }
+.points li { margin-bottom: 8px; }
+.poster-wrap { max-width: 420px; margin: 0 auto; }
+.poster-wrap canvas { width: 100%; height: auto; display: block; border-radius: 14px; box-shadow: var(--shadow); }
+
+/* =====================================================================
+   4. PANEL AJK
+   ===================================================================== */
+.atabs { display: flex; gap: 6px; overflow-x: auto; padding: 4px; margin-bottom: 18px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 18px; scrollbar-width: none; }
+.atabs::-webkit-scrollbar { display: none; }
+.atab { flex: 1 0 auto; min-height: var(--tap); padding: 8px 16px; border-radius: 14px; border: 0; background: none; cursor: pointer; font-weight: 700; font-size: .95rem; color: var(--muted); white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.atab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+.tabs { display: flex; gap: 4px; padding: 4px; background: var(--surface-2); border-radius: 16px; overflow-x: auto; margin-bottom: 14px; border: 1px solid var(--border); }
+.tab { flex: 1 0 auto; min-height: var(--tap); padding: 8px 14px; border-radius: 12px; border: 0; background: none; cursor: pointer; font-weight: 700; font-size: .92rem; color: var(--muted); }
+.tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+.tab .count { font-size: .76rem; padding: 1px 7px; border-radius: 999px; background: var(--primary-soft); color: var(--primary); margin-left: 4px; }
+
+.stepper { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 18px; }
+.step { flex: 1 1 90px; padding: 8px 10px; border-radius: 12px; font-size: .82rem; font-weight: 700; text-align: center; background: var(--surface-2); color: var(--muted); border: 1px solid var(--border); }
+.step.done { background: var(--primary-soft); color: var(--primary); border-color: transparent; }
+.step.now { background: var(--primary); color: var(--on-primary); border-color: transparent; box-shadow: 0 6px 18px -8px var(--primary); }
+.ctl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (min-width: 900px) { .ctl-grid { grid-template-columns: repeat(4, 1fr); } }
+.ctl { min-height: 96px; flex-direction: column; font-size: 1.05rem; border-radius: 18px; }
+.ctl svg { width: 28px; height: 28px; }
+.ctl small { font-weight: 600; font-size: .78rem; opacity: .85; }
+.live-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 16px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.stat { padding: 14px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); }
+.stat b { display: block; font-size: 1.7rem; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.stat span { font-size: .85rem; color: var(--muted); font-weight: 600; }
+
+.admin-layout { display: grid; gap: 16px; }
+.admin-layout > * { min-width: 0; }
+@media (min-width: 960px) { .admin-layout { grid-template-columns: 320px 1fr; align-items: start; } }
+.s-list { display: grid; gap: 8px; max-height: 60vh; overflow: auto; }
+.s-item { text-align: left; width: 100%; min-height: var(--tap); padding: 12px; border-radius: 12px; cursor: pointer; border: 2px solid var(--border); background: var(--surface-2); }
+.s-item.active { border-color: var(--primary); background: var(--primary-soft); }
+.s-item b { display: block; font-size: .95rem; margin-bottom: 4px; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: .88rem; color: var(--muted); align-items: center; }
+.tpl-item { padding: 14px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface-2); margin-bottom: 10px; }
+.tpl-item b { display: block; font-size: 1.02rem; }
+.tpl-item .btn-row { margin-top: 10px; gap: 6px; }
+.q-card { border: 1px solid var(--border); border-radius: 14px; padding: 14px; background: var(--surface-2); margin-bottom: 10px; }
+.q-card.is-ok { border-left: 5px solid var(--primary); }
+.q-card.is-draft { border-left: 5px solid var(--warn); }
+.q-card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.q-card-head .spacer { flex: 1; }
+.q-num { flex: none; width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: var(--primary-soft); color: var(--primary); font-weight: 800; font-size: .92rem; }
+.opt-edit { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.opt-edit input[type="radio"] { width: 26px; height: 26px; accent-color: var(--primary); flex: none; }
+.opt-edit .k { width: 22px; font-weight: 800; color: var(--muted); flex: none; }
+.oneclick { border: 2px solid color-mix(in srgb, var(--gold-bright) 60%, var(--border)); background: linear-gradient(180deg, var(--gold-soft), var(--surface) 55%); }
+
+.table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); max-width: 100%; }
+table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { background: var(--surface-2); font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 800; }
+tr:last-child td { border-bottom: 0; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.wrap { white-space: normal; min-width: 170px; }
+.chart { width: 100%; height: 280px; display: block; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: .9rem; font-weight: 600; margin-top: 8px; }
+.legend i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; vertical-align: -2px; margin-right: 6px; }
+.bar-row { padding: 12px 0; border-bottom: 1px dashed var(--border); }
+.bar-row:last-child { border-bottom: 0; }
+.bar-head { display: flex; justify-content: space-between; gap: 10px; font-size: .92rem; margin-bottom: 6px; }
+.bar-head b { white-space: nowrap; }
+.bar { height: 14px; border-radius: 8px; background: var(--surface-2); overflow: hidden; border: 1px solid var(--border); }
+.bar > i { display: block; height: 100%; border-radius: 8px; background: var(--primary); }
+.bar > i.mid { background: var(--gold-bright); }
+.bar > i.low { background: var(--danger); }
+.podium { display: grid; gap: 12px; margin-bottom: 18px; }
+@media (min-width: 700px) { .podium { grid-template-columns: 1fr 1.15fr 1fr; align-items: end; } .podium .p1 { order: 2; } .podium .p2 { order: 1; } .podium .p3 { order: 3; } }
+.pod { position: relative; text-align: center; padding: 22px 16px 18px; border-radius: 20px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; }
+.pod::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 5px; background: var(--c); }
+.pod.p1 { --c: linear-gradient(90deg, #d4af5f, #f5dc9c, #d4af5f); background: linear-gradient(180deg, var(--gold-soft), var(--surface) 70%); }
+.pod.p2 { --c: linear-gradient(90deg, #9ca3af, #e5e7eb, #9ca3af); }
+.pod.p3 { --c: linear-gradient(90deg, #b87333, #e0a872, #b87333); }
+.medal { width: 56px; height: 56px; margin: 0 auto 10px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 1.3rem; color: #1b1405; background: var(--c); }
+.pod .name { font-weight: 800; font-size: 1.08rem; }
+.pod .score { font-size: .9rem; color: var(--muted); }
+.winner-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.winner-row:last-child { border-bottom: 0; }
+.winner-row .rank { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; background: var(--gold-soft); color: var(--gold); flex: none; }
+.winner-row .info { flex: 1; min-width: 150px; }
+.winner-row .info b { display: block; }
+.empty { text-align: center; padding: 36px 18px; }
+
+/* PIN */
+.gate { max-width: 400px; margin: 30px auto; text-align: center; padding: 28px 22px; }
+.pin-input { text-align: center; font-size: 1.6rem !important; letter-spacing: .5em; font-weight: 800; }
+.shake { animation: shake .4s; }
+@keyframes shake { 20%,60% { transform: translateX(-8px); } 40%,80% { transform: translateX(8px); } }
+
+/* =====================================================================
+   5. SKRIN BESAR (#skrin) — QR, soalan & roda cabutan
+   ===================================================================== */
+.skrin {
+  position: relative; min-height: 100vh; overflow: hidden; color: #f2fbf6;
+  padding: 20px clamp(16px, 3vw, 44px) 28px;
+  background: radial-gradient(ellipse at 50% -10%, rgba(212,175,95,.22), transparent 55%), linear-gradient(160deg, #022c22, #064e3b 50%, #03271e);
+  display: flex; flex-direction: column; gap: 16px;
+}
+.skrin::before { content: ""; position: absolute; inset: 0; opacity: .08; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23f0d18a' stroke-width='1.2'%3E%3Crect x='38' y='38' width='44' height='44'/%3E%3Crect x='38' y='38' width='44' height='44' transform='rotate(45 60 60)'/%3E%3Ccircle cx='60' cy='60' r='10'/%3E%3C/g%3E%3C/svg%3E"); background-size: 120px; }
+.skrin > * { position: relative; }
+.skrin-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.skrin-brand { flex: 1; min-width: 200px; font-size: .85rem; letter-spacing: .1em; text-transform: uppercase; color: #f5dc9c; font-weight: 800; }
+.skrin-brand span { display: block; color: #d3efe2; letter-spacing: .03em; text-transform: none; font-size: 1rem; }
+.skrin select { min-height: var(--tap); border-radius: 14px; padding: 8px 12px; background: rgba(255,255,255,.1); color: #fff; border: 1.5px solid rgba(255,255,255,.3); max-width: 300px; }
+.skrin select option { color: #06140f; }
+.skrin .btn-ghost { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.32); color: #f2fbf6; }
+.skrin .btn-ghost:hover { background: rgba(255,255,255,.16); }
+.skrin-body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 16px; text-align: center; }
+.skrin-title { font-size: clamp(1.4rem, 3.4vw, 2.6rem); font-weight: 800; color: #fff; margin: 0; }
+.skrin-sub { color: #d3efe2; font-size: clamp(1rem, 1.8vw, 1.3rem); }
+.skrin-cta { font-size: clamp(1.3rem, 3vw, 2.2rem); font-weight: 800; color: #fbe7b0; }
+.qr-big { background: #fff; padding: 16px; border-radius: 22px; width: min(78vw, 46vh, 420px); margin: 0 auto; border: 5px solid #f0d18a; box-shadow: 0 20px 60px -20px rgba(0,0,0,.6); }
+.qr-big img, .qr-big canvas, .qr-small img, .qr-small canvas { width: 100% !important; height: auto !important; display: block; image-rendering: pixelated; }
+.qr-small { background: #fff; padding: 8px; border-radius: 14px; width: 150px; border: 3px solid #f0d18a; margin: 0 auto; }
+.rot { width: min(78vw, 46vh, 420px); margin: 0 auto; }
+.rot-bar { height: 10px; background: rgba(255,255,255,.15); border-radius: 10px; overflow: hidden; }
+.rot-bar i { display: block; height: 100%; background: linear-gradient(90deg, #f0d18a, #34d399); transition: width 1s linear; }
+.skrin .free-pill { background: rgba(52,211,153,.18); color: #b9f5dc; border: 1px solid rgba(52,211,153,.45); font-size: 1.05rem; }
+.live-count { font-size: clamp(1.1rem, 2vw, 1.5rem); color: #fbe7b0; font-weight: 800; }
+.sq-grid { display: grid; gap: 20px; align-items: center; }
+@media (min-width: 900px) { .sq-grid { grid-template-columns: 1fr 260px; } }
+.sq-card { background: rgba(255,255,255,.07); border: 1px solid rgba(240,209,138,.35); border-radius: 24px; padding: clamp(18px, 3vw, 36px); text-align: left; animation: fadeUp .5s ease both; }
+.sq-card .qn { color: #f5dc9c; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-size: .9rem; }
+.sq-card h2 { font-size: clamp(1.3rem, 2.8vw, 2.2rem); color: #fff; margin: 10px 0 18px; line-height: 1.35; }
+.sq-opts { display: grid; gap: 10px; }
+@media (min-width: 700px) { .sq-opts { grid-template-columns: 1fr 1fr; } }
+.sq-opts div { padding: 14px 18px; border-radius: 16px; background: rgba(255,255,255,.1); font-size: clamp(1rem, 1.8vw, 1.4rem); font-weight: 700; }
+.big-timer { font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 800; font-variant-numeric: tabular-nums; color: #fff; }
+
+/* Roda cabutan */
+.draw-grid { display: grid; gap: 20px; align-items: center; }
+@media (min-width: 900px) { .draw-grid { grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); } }
+.wheel-wrap { position: relative; width: min(92vw, 74vh, 720px); aspect-ratio: 1; margin: 0 auto; }
+.wheel-wrap canvas { width: 100%; height: 100%; display: block; filter: drop-shadow(0 24px 40px rgba(0,0,0,.45)); }
+.pointer { position: absolute; top: -4px; left: 50%; transform: translateX(-50%); width: 0; height: 0; z-index: 3; border-left: 24px solid transparent; border-right: 24px solid transparent; border-top: 44px solid #f5dc9c; filter: drop-shadow(0 4px 6px rgba(0,0,0,.5)); }
+.win-overlay { position: absolute; inset: 17%; z-index: 4; border-radius: 50%; display: grid; place-items: center; text-align: center; padding: 8%;
+  background: radial-gradient(circle, #065f46 0%, #022c22 75%); border: 6px solid #f5dc9c; box-shadow: 0 0 80px rgba(240,209,138,.6); animation: winPop .7s cubic-bezier(.34,1.56,.64,1) both; }
+.win-overlay .wl { color: #f5dc9c; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; font-size: clamp(.8rem, 1.6vw, 1.1rem); }
+.win-overlay .wn { color: #fff; font-weight: 800; font-size: clamp(1.3rem, 3.6vw, 3rem); line-height: 1.1; margin: 8px 0; word-break: break-word; }
+.win-overlay .wp { color: #fbe7b0; font-weight: 700; font-size: clamp(1rem, 2vw, 1.5rem); }
+@keyframes winPop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.side { background: rgba(255,255,255,.07); border: 1px solid rgba(240,209,138,.3); border-radius: 24px; padding: 20px; text-align: left; }
+.prize-label { display: block; padding: 10px 16px; border-radius: 16px; background: rgba(240,209,138,.16); border: 1px solid rgba(240,209,138,.5); color: #fbe7b0; font-weight: 800; font-size: clamp(1rem, 1.8vw, 1.35rem); margin-bottom: 14px; }
+.wlist { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; }
+.wlist li { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; background: rgba(255,255,255,.08); animation: fadeUp .4s ease both; }
+.wlist li b { color: #fbe7b0; flex: none; }
+.wlist li span { min-width: 0; }
+.wlist small { display: block; color: #cfeee0; }
+.skrin :focus-visible { outline-color: #f5dc9c; }
+.stage:fullscreen, .skrin:fullscreen { min-height: 100vh; }
+
+/* Toast, modal, konfeti */
+.toasts { position: fixed; left: 50%; transform: translateX(-50%); top: 14px; z-index: 400; display: grid; gap: 8px; width: min(92vw, 420px); pointer-events: none; }
+.toast { padding: 14px 16px; border-radius: 14px; background: var(--text); color: var(--bg); font-size: .98rem; font-weight: 700; box-shadow: var(--shadow-lg); animation: toastIn .35s cubic-bezier(.34,1.56,.64,1) both; }
+.toast.error { background: #a01b12; color: #fff; }
+.toast.success { background: #046c4e; color: #fff; }
+.toast.out { animation: toastOut .25s ease forwards; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
+@keyframes toastOut { to { opacity: 0; transform: translateY(-10px); } }
+.modal-back { position: fixed; inset: 0; z-index: 150; background: rgba(2,20,14,.62); display: flex; align-items: flex-end; justify-content: center; animation: fadeIn .2s ease both; }
+@media (min-width: 640px) { .modal-back { align-items: center; padding: 16px; } }
+.modal { width: 100%; max-width: 540px; max-height: 92vh; overflow: auto; background: var(--surface); color: var(--text); text-align: left; border-radius: 22px 22px 0 0; padding: 22px 18px calc(18px + env(safe-area-inset-bottom)); box-shadow: var(--shadow-lg); }
+@media (min-width: 640px) { .modal { border-radius: 22px; padding: 24px; } }
+.modal .btn-row { margin-top: 16px; justify-content: flex-end; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.confetti-canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 300; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#j" aria-label="Ganjaran Ilmu Jemaah Masjid">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f0d18a" stroke-width="1.6" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12"/><rect x="6" y="6" width="12" height="12" transform="rotate(45 12 12)"/><circle cx="12" cy="12" r="2.4" fill="#f0d18a" stroke="none"/></svg>
+      </span>
+      <span class="brand-text"><span class="brand-title">Ganjaran Ilmu Jemaah</span><span class="brand-sub" id="brandSub">Masjid</span></span>
+    </a>
+    <span id="topExtra"></span>
+    <button class="icon-btn" id="themeToggle" type="button" aria-label="Tukar mod gelap/terang"></button>
+  </div>
+</header>
+<main id="app" tabindex="-1"></main>
+<footer class="foot">Ganjaran Ilmu Jemaah Masjid &middot; Penyertaan adalah <b>PERCUMA</b> &middot; <span id="footMasjid"></span></footer>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+'use strict';
+
+/* =====================================================================
+   1. KONFIGURASI
+   ---------------------------------------------------------------------
+   Isi SUPABASE_URL & SUPABASE_ANON_KEY untuk mod masa nyata sebenar
+   (jalankan schema.sql dalam projek Supabase dahulu).
+   Jika kosong → MOD DEMO: localStorage + BroadcastChannel (beberapa tab).
+   ===================================================================== */
+const CONFIG = {
+  SUPABASE_URL: 'https://boduxgjxrxtvpemzokdm.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvZHV4Z2p4cnh0dnBlbXpva2RtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0MDcyMTEsImV4cCI6MjEwNTk4MzIxMX0.pYvW8o-5mq7MEmwlii7NRe1ENtsTgYFWbj1ZqRjxIc4',
+  AI_ENDPOINT: '',                 // proksi AI anda (lihat generateQuestions)
+  APP_NAME: 'Ganjaran Ilmu Jemaah Masjid',
+  SCHEMA_VERSION: 3,
+  STORAGE_KEY: 'cbj_db_v1',        // kekal sama — data lama dimigrasi automatik
+  DEFAULT_PIN: '1234',
+  MIN_Q: 3, MAX_Q: 5,              // bilangan soalan setiap sesi
+  TOKEN_WINDOW_MS: 60 * 1000,      // token QR bertukar setiap 60 saat
+  TOKEN_GRACE_MS: 15 * 1000,       // tenggang selepas token bertukar
+  CHECKIN_TTL_MS: 30 * 60 * 1000,  // masa lengkapkan pendaftaran selepas imbas
+  ANSWER_GRACE_MS: 5 * 1000,       // tenggang hantar jawapan selepas masa tamat
+  WHEEL_MAX: 40,                   // maksimum nama pada roda
+  SPIN_MIN_MS: 6000, SPIN_MAX_MS: 8000,
+};
+const MODE = CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY ? 'supabase' : 'demo';
+/* ?dev=A dalam URL = simulasi "telefon" berasingan dalam satu pelayar (mod demo/ujian) */
+const DEVICE_NS = (new URLSearchParams(location.search).get('dev') || '').replace(/[^\w-]/g, '').slice(0, 20);
+const NS = DEVICE_NS ? '_' + DEVICE_NS : '';
+const K = {
+  me: 'gij_me' + NS, current: 'gij_current' + NS, checkin: 'gij_checkin' + NS,
+  draft: (sid) => `gij_draft${NS}_${sid}`, theme: 'cbj_theme', sound: 'gij_sound',
+  admin: 'cbj_admin_ok', pin: 'gij_pin',
+};
+const STATES = ['draft', 'registration', 'questions', 'closed', 'drawing', 'done'];
+const STATE_LABEL = { draft: 'Draf', registration: 'Pendaftaran', questions: 'Soalan dibuka', closed: 'Soalan ditutup', drawing: 'Cabutan', done: 'Selesai' };
+
+/* =====================================================================
+   2. UTILITI
+   ===================================================================== */
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = (p = '') => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const nowISO = () => new Date().toISOString();
+const pad2 = (n) => String(n).padStart(2, '0');
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const pct = (a, b) => (b ? Math.round((a / b) * 100) : null);
+const ymd = (x) => `${x.getFullYear()}-${pad2(x.getMonth() + 1)}-${pad2(x.getDate())}`;
+const hm = (x) => `${pad2(x.getHours())}:${pad2(x.getMinutes())}`;
+const today = () => ymd(new Date());
+const sessionKey = (s) => `${s.date}T${s.startTime || '00:00'}`;
+const WEEKDAYS = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+function randInt(n) { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; }
+function shuffle(arr) { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = randInt(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function randomSecret() { const a = new Uint8Array(16); crypto.getRandomValues(a); return [...a].map((b) => b.toString(16).padStart(2, '0')).join(''); }
+/** Hash ringkas (djb2) — PIN & tandatangan token dalam MOD DEMO sahaja. */
+function hashPin(s) { let h = 5381; for (const ch of 'cbj::' + s) h = (((h << 5) + h) + ch.charCodeAt(0)) >>> 0; return h.toString(16); }
+/** Storan tempatan selamat (try/catch). */
+const LS = {
+  get(k, d = null) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+};
+const SS = {
+  get(k) { try { return sessionStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { sessionStorage.setItem(k, v); } catch {} },
+  del(k) { try { sessionStorage.removeItem(k); } catch {} },
+};
+
+/** Susunan pilihan dirawak tetapi TETAP bagi setiap peserta (seed = peserta + soalan). */
+function optionOrder(pid, qid, n = 4) {
+  let h = parseInt(hashPin(pid + '#' + qid), 16) || 1;
+  const rnd = () => { h = (h + 0x6D2B79F5) | 0; let t = Math.imul(h ^ (h >>> 15), 1 | h); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const a = [...Array(n).keys()];
+  for (let i = n - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+/* Telefon Malaysia */
+function normalizePhone(raw) {
+  let p = String(raw || '').replace(/[\s\-().]/g, '');
+  if (p.startsWith('+60')) p = '0' + p.slice(3); else if (p.startsWith('60')) p = '0' + p.slice(2);
+  return p;
+}
+function isValidPhone(p) { if (!/^01\d{8,9}$/.test(p)) return false; return p.startsWith('011') ? p.length === 11 : true; }
+const formatPhone = (p) => p ? `${p.slice(0, 3)}-${p.slice(3, p.length - 4)} ${p.slice(-4)}` : '';
+const maskPhone = (p) => p ? `${p.slice(0, 3)}-***${p.slice(-4)}` : '';
+const waNumber = (p) => '6' + p;
+/* Privasi nama — setara dengan gij__mask_name / gij__norm_name dalam schema.sql */
+/** Nama pertama sahaja, bertopeng: "Ahmad Hafiz bin Ali" → "Ahm***" (tiada bin/binti, tiada nama bapa) */
+function maskName(name) {
+  const w = String(name || '').trim().split(/\s+/)[0] || '';
+  return w ? w.slice(0, Math.min(3, Math.max(1, w.length - 2))) + '***' : '';
+}
+const NAME_SKIP = new Set(['bin', 'binti', 'bt', 'bte', 'b', 'a', 'l', 'p', 'hj', 'haji', 'hajah', 'hajjah', 'hjh']);
+/** Bandingan nama bertoleransi: abaikan huruf besar/kecil, tanda baca, "bin/binti", "Hj". */
+function normName(name) { return String(name || '').toLowerCase().replace(/[^a-z]+/g, ' ').split(' ').filter((w) => w && !NAME_SKIP.has(w)).join(''); }
+const NAME_MAX_FAILS = 5, NAME_LOCK_MS = 15 * 60 * 1000;
+
+/* Tarikh & masa */
+function fmtDate(d) { const x = d instanceof Date ? d : new Date(d + 'T00:00'); return x.toLocaleDateString('ms-MY', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); }
+function fmtDateShort(d) { const x = d instanceof Date ? d : new Date(d + 'T00:00'); return x.toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' }); }
+function fmtTime12(t) { if (!t) return ''; let [h, m] = t.split(':').map(Number); const s = h >= 12 ? 'ptg' : 'pg'; if (h === 0) h = 12; else if (h > 12) h -= 12; return `${h}:${pad2(m)} ${s}`; }
+function fmtDuration(ms) { const s = Math.max(0, Math.ceil(ms / 1000)); const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60); return (h ? pad2(h) + ':' : '') + pad2(m) + ':' + pad2(s % 60); }
+/** Tarikh seterusnya (bermula `from` atau hari ini) yang jatuh pada hari minggu tertentu. */
+function nextDateForWeekday(wd, from) {
+  const d = from ? new Date(from + 'T00:00') : new Date();
+  if (wd === null || wd === undefined || wd === '') return ymd(d);
+  while (d.getDay() !== Number(wd)) d.setDate(d.getDate() + 1);
+  return ymd(d);
+}
+/** Tarikh sesi baharu templat: selepas sesi terakhir templat itu (elak dua sesi pada tarikh sama). */
+function nextTemplateDate(t, sessions) {
+  const last = sessions.filter((s) => s.templateId === t.id).map((s) => s.date).sort().pop();
+  let from = null;
+  if (last && last >= today()) { const x = new Date(last + 'T00:00'); x.setDate(x.getDate() + 1); from = ymd(x); }
+  return nextDateForWeekday(t.weekday, from);
+}
+const minutesBetween = (a, b) => { if (!a || !b) return 0; const [h1, m1] = a.split(':').map(Number), [h2, m2] = b.split(':').map(Number); return (h2 * 60 + m2) - (h1 * 60 + m1); };
+
+/* Ikon */
+const svg = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ICON = {
+  sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
+  moon: svg('<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'),
+  check: svg('<path d="M20 6 9 17l-5-5"/>'),
+  lock: svg('<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'),
+  info: svg('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>'),
+  alert: svg('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>'),
+  download: svg('<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>'),
+  share: svg('<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>'),
+  sparkle: svg('<path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"/>'),
+  bolt: svg('<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>'),
+  plus: svg('<path d="M12 5v14M5 12h14"/>'),
+  trash: svg('<path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2"/>'),
+  edit: svg('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>'),
+  arrow: svg('<path d="M5 12h14M12 5l7 7-7 7"/>'),
+  expand: svg('<path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/>'),
+  ticket: svg('<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><path d="M13 5v2M13 17v2M13 11v2"/>'),
+  qr: svg('<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 17h4v4h-4"/>'),
+  hourglass: svg('<path d="M6 2h12M6 22h12M7 2v4a5 5 0 0 0 5 5 5 5 0 0 0 5-5V2M7 22v-4a5 5 0 0 1 5-5 5 5 0 0 1 5 5v4"/>'),
+  gift: svg('<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/>'),
+  heart: svg('<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21.2l8.8-8.8a5.5 5.5 0 0 0 0-7.8z"/>'),
+  user: svg('<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'),
+  play: svg('<path d="M5 3l14 9-14 9z"/>'),
+  stop: svg('<rect x="5" y="5" width="14" height="14" rx="2"/>'),
+  users: svg('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>'),
+  sound: svg('<path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>'),
+  mute: svg('<path d="M11 5 6 9H2v6h4l5 4z"/><path d="m23 9-6 6M17 9l6 6"/>'),
+  book: svg('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5V21h16"/>'),
+  layers: svg('<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/>'),
+  pin: svg('<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>'),
+  logout: svg('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>'),
+  search: svg('<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'),
+  whatsapp: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z"/></svg>',
+};
+
+/* Toast & modal */
+function toast(msg, type = '') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`; el.setAttribute('role', type === 'error' ? 'alert' : 'status'); el.textContent = msg;
+  $('#toasts').appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 260); }, 3200);
+}
+/** Modal generik. onAction(value, el) → false untuk kekal terbuka (validasi). */
+function openModal({ title = '', html = '', actions = [{ label: 'Tutup', cls: 'btn-ghost', value: null }], onOpen, onAction } = {}) {
+  return new Promise((resolve) => {
+    const back = document.createElement('div');
+    back.className = 'modal-back';
+    back.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-label="${esc(title)}">${title ? `<h3>${esc(title)}</h3>` : ''}<div class="modal-body">${html}</div>
+      <div class="btn-row">${actions.map((a, i) => `<button type="button" class="btn ${a.cls || 'btn-ghost'}" data-i="${i}">${a.label}</button>`).join('')}</div></div>`;
+    (document.fullscreenElement || document.body).appendChild(back);
+    const done = (v) => { back.remove(); document.removeEventListener('keydown', onKey); resolve(v); };
+    const onKey = (e) => { if (e.key === 'Escape') done(null); };
+    document.addEventListener('keydown', onKey);
+    back.addEventListener('click', (e) => {
+      if (e.target === back) return done(null);
+      const b = e.target.closest('[data-i]'); if (!b) return;
+      const v = actions[+b.dataset.i].value;
+      if (onAction && onAction(v, back) === false) return;
+      done(v);
+    });
+    onOpen && onOpen(back);
+    const f = back.querySelector('.modal-body input, .modal-body select') || back.querySelector('.btn-row .btn:last-child');
+    f && f.focus();
+  });
+}
+const confirmDialog = (msg, ok = 'Ya, teruskan', danger = false) => openModal({ title: 'Pengesahan', html: `<p>${msg}</p>`, actions: [{ label: 'Batal', cls: 'btn-ghost', value: false }, { label: ok, cls: danger ? 'btn-danger' : 'btn-primary', value: true }] });
+function downloadBlob(content, filename, type) {
+  const blob = content instanceof Blob ? content : new Blob([content], { type });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+const slug = (s) => String(s).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'fail';
+function csvDownload(head, rows, filename) {
+  const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  downloadBlob('﻿' + [head, ...rows].map((r) => r.map(cell).join(',')).join('\r\n'), filename, 'text/csv;charset=utf-8');
+}
+function setFieldError(sel, msg) {
+  const f = $(sel); if (!f) return;
+  f.classList.toggle('invalid', !!msg);
+  const e = $('.error', f); e.textContent = msg || ''; e.classList.toggle('hidden', !msg);
+}
+
+/* =====================================================================
+   3. LOGIK DOMAIN (fungsi tulen atas objek data `d`)
+   ---------------------------------------------------------------------
+   Struktur data (schemaVersion 3) — sama dengan jadual dalam schema.sql:
+   settings      { masjidName, pinHash, tokenSecret, streak{threshold,bonus}, geo{enabled,lat,lng,radius} }
+   templates     { id, name, title, speaker, weekday, startTime, endTime, answerMinutes, prizes[] }
+   sessions      { id, templateId, title, speaker, date, startTime, endTime, answerMinutes,
+                   transcript, summary[], prizes[], state, stateAt, questionsOpenedAt, questionsCloseAt, rev }
+   questions     { id, sessionId, text, options[4], correctIndex, status('draf'|'lulus'), source }
+   participants  { id, name, phone(unik), secret }
+   registrations { id, sessionId, participantId, regNo, checkinAt, dist }  ← juga sumber streak
+   answers       { id, sessionId, participantId, questionId, choiceIndex, isCorrect }
+   winners       { id, sessionId, participantId, prize, order, spinMs, revealAt, wheel[] }
+   ===================================================================== */
+const Logic = {
+  approved(d, sid) { return d.questions.filter((q) => q.sessionId === sid && q.status === 'lulus'); },
+  /** Rantaian sesi satu templat (bukan draf), ikut kronologi. */
+  chain(d, tid) { return d.sessions.filter((s) => s.templateId === tid && s.state !== 'draft').sort((a, b) => sessionKey(a).localeCompare(sessionKey(b))); },
+  attended(d, pid) { return new Set(d.registrations.filter((r) => r.participantId === pid).map((r) => r.sessionId)); },
+  /** Streak pada sesi: bilangan sesi berturut-turut (templat sama) berakhir di sesi ini. */
+  streakAt(d, pid, sid, cache = {}) {
+    const s = d.sessions.find((x) => x.id === sid);
+    if (!s || !s.templateId) return 0;
+    const chain = cache.chain || this.chain(d, s.templateId);
+    const att = cache.att || this.attended(d, pid);
+    const idx = chain.findIndex((x) => x.id === sid);
+    if (idx < 0 || !att.has(sid)) return 0;
+    let n = 0;
+    for (let i = idx; i >= 0 && att.has(chain[i].id); i--) n++;
+    return n;
+  },
+  /** Tiket bonus pada setiap gandaan ambang streak (cth. 3, 6, 9…). */
+  bonusFor(d, pid, sid, cache) {
+    const { threshold, bonus } = d.settings.streak;
+    if (!(threshold > 0 && bonus > 0)) return 0;
+    const st = this.streakAt(d, pid, sid, cache);
+    return st > 0 && st % threshold === 0 ? bonus : 0;
+  },
+  streakStats(d, pid) {
+    const att = this.attended(d, pid);
+    const tids = new Set(d.sessions.filter((s) => att.has(s.id) && s.templateId).map((s) => s.templateId));
+    let current = 0, best = 0;
+    for (const tid of tids) {
+      const chain = this.chain(d, tid); // rantaian sudah mengecualikan draf; sesi dibuka awal tetap dikira
+      let run = 0;
+      chain.forEach((s, i) => {
+        if (att.has(s.id)) { run++; best = Math.max(best, run); }
+        else if (!(i === chain.length - 1 && ['registration', 'questions'].includes(s.state))) run = 0; // sesi sedang berjalan belum dikira terlepas
+      });
+      current = Math.max(current, run);
+    }
+    return { current, best };
+  },
+  /** Tiket sesi: 1 entri per jawapan betul + tiket bonus streak. */
+  tickets(d, sid) {
+    const out = d.answers.filter((a) => a.sessionId === sid && a.isCorrect).map((a) => a.participantId);
+    const s = d.sessions.find((x) => x.id === sid);
+    if (s && s.templateId) {
+      const chain = this.chain(d, s.templateId);
+      d.registrations.filter((r) => r.sessionId === sid).forEach((r) => {
+        const b = this.bonusFor(d, r.participantId, sid, { chain });
+        for (let i = 0; i < b; i++) out.push(r.participantId);
+      });
+    }
+    return out;
+  },
+  ticketsOf(d, sid, pid) {
+    const correct = d.answers.filter((a) => a.sessionId === sid && a.participantId === pid && a.isCorrect).length;
+    const reg = d.registrations.some((r) => r.sessionId === sid && r.participantId === pid);
+    const bonus = reg ? this.bonusFor(d, pid, sid) : 0;
+    return { correct, bonus, total: correct + bonus };
+  },
+  winners(d, sid) { return d.winners.filter((w) => w.sessionId === sid).sort((a, b) => a.order - b.order); },
+  /** Tiket layak — pemenang sesi ini dikecualikan (seorang menang sekali setiap sesi). */
+  pool(d, sid) { const taken = new Set(this.winners(d, sid).map((w) => w.participantId)); return this.tickets(d, sid).filter((p) => !taken.has(p)); },
+  /** Semak peralihan keadaan sesi. Pulangkan '' jika sah, atau sebab (BM). */
+  transitionError(d, s, to) {
+    const from = { registration: ['draft'], questions: ['registration'], closed: ['questions'], drawing: ['closed'], done: ['closed', 'drawing'] }[to];
+    if (!from) return 'Keadaan tidak sah';
+    if (!from.includes(s.state)) return `Tidak boleh tukar dari "${STATE_LABEL[s.state]}" ke "${STATE_LABEL[to]}"`;
+    const n = this.approved(d, s.id).length;
+    if (['registration', 'questions'].includes(to) && (n < CONFIG.MIN_Q || n > CONFIG.MAX_Q)) return `Perlu ${CONFIG.MIN_Q}–${CONFIG.MAX_Q} soalan diluluskan (kini ${n})`;
+    if (to === 'drawing' && !(s.prizes || []).length) return 'Tetapkan sekurang-kurangnya satu hadiah dahulu';
+    return '';
+  },
+  ranking(d) {
+    const map = new Map(d.participants.map((p) => [p.id, { p, sessions: new Set(), correct: 0, answered: 0, wins: 0 }]));
+    d.registrations.forEach((r) => map.get(r.participantId)?.sessions.add(r.sessionId));
+    d.answers.forEach((a) => { const m = map.get(a.participantId); if (m) { m.answered++; if (a.isCorrect) m.correct++; } });
+    d.winners.forEach((w) => { const m = map.get(w.participantId); if (m) m.wins++; });
+    return [...map.values()].filter((r) => r.sessions.size > 0)
+      .map((r) => ({ ...r, sessionCount: r.sessions.size, streak: this.streakStats(d, r.p.id) }))
+      .sort((a, b) => b.sessionCount - a.sessionCount || b.streak.current - a.streak.current || b.correct - a.correct || a.p.name.localeCompare(b.p.name));
+  },
+  /**
+   * Paparan jemaah — SAHAJA maklumat yang jemaah boleh lihat.
+   * (Versi SQL yang setara: gij_jemaah_view dalam schema.sql.)
+   */
+  jemaahView(d, sid, pid, secret, now = Date.now()) {
+    const base = { now, masjidName: d.settings.masjidName, geo: d.settings.geo };
+    const s = d.sessions.find((x) => x.id === sid);
+    if (!s) return { ...base, ok: false, reason: 'notfound' };
+    const p = pid ? d.participants.find((x) => x.id === pid && x.secret === secret) : null;
+    const reg = p ? d.registrations.find((r) => r.sessionId === sid && r.participantId === p.id) : null;
+    const qs = this.approved(d, sid);
+    const mine = reg ? d.answers.filter((a) => a.sessionId === sid && a.participantId === p.id) : [];
+    const ws = this.winners(d, sid);
+    const revealed = ws.filter((w) => Date.parse(w.revealAt) <= now);
+    const pending = ws.filter((w) => Date.parse(w.revealAt) > now).map((w) => Date.parse(w.revealAt));
+    const myWin = p ? revealed.find((w) => w.participantId === p.id) : null;
+    const closeAt = s.questionsCloseAt ? Date.parse(s.questionsCloseAt) : null;
+    const answering = s.state === 'questions' && closeAt && now <= closeAt;
+    const t = reg ? this.ticketsOf(d, sid, p.id) : null;
+    const byQ = new Map(mine.map((a) => [a.questionId, a]));
+    return {
+      ...base, ok: true, knownDevice: !!p,
+      session: { id: s.id, title: s.title, speaker: s.speaker, date: s.date, startTime: s.startTime, endTime: s.endTime, state: s.state, questionsCloseAt: s.questionsCloseAt, qCount: qs.length },
+      registered: !!reg, regNo: reg?.regNo ?? null, name: p?.name ?? null,
+      streak: reg ? this.streakAt(d, p.id, sid) : 0, bonus: t?.bonus || 0,
+      answered: mine.length > 0,
+      tickets: reg && (mine.length || !['draft', 'registration'].includes(s.state) && !answering) ? t.total : null,
+      questions: answering && reg && !mine.length ? qs.map((q) => ({ id: q.id, text: q.text, options: optionOrder(p.id, q.id).map((i) => ({ i, text: q.options[i] })) })) : null,
+      win: myWin ? { prize: myWin.prize, order: myWin.order } : null,
+      pendingRevealAt: pending.length ? Math.min(...pending) : null,
+      review: s.state === 'done' ? {
+        summary: s.summary || [],
+        items: qs.map((q) => { const a = byQ.get(q.id); return { text: q.text, answer: q.options[q.correctIndex], mine: a ? q.options[a.choiceIndex] : null, correct: a ? a.isCorrect : null }; }),
+      } : null,
+    };
+  },
+};
+
+/* =====================================================================
+   4. TOKEN QR & TIKET CHECK-IN (MOD DEMO — dalam Supabase dibuat di pelayan)
+   ===================================================================== */
+/** Jam pelayan: offset antara jam peranti & pelayan (Supabase). Jam komputer/telefon yang
+    tidak tepat tidak boleh memendekkan masa menjawab atau memaparkan QR yang hampir tamat. */
+const Clock = { offset: 0, now() { return Date.now() + this.offset; } };
+const Token = {
+  slot(t = Clock.now()) { return Math.floor(t / CONFIG.TOKEN_WINDOW_MS); },
+  msLeft(t = Clock.now()) { return CONFIG.TOKEN_WINDOW_MS - (t % CONFIG.TOKEN_WINDOW_MS); },
+  sign(secret, msg) { return (hashPin(`${secret}|${msg}`) + hashPin(`${msg}|${secret}`)).slice(0, 12); },
+  make(secret, sid, slot = this.slot()) { return `${slot}-${this.sign(secret, sid + '|' + slot)}`; },
+  verify(secret, sid, token, now = Date.now()) {
+    const m = /^(\d+)-([0-9a-f]{1,16})$/.exec(String(token || ''));
+    if (!m) return 'invalid';
+    const slot = Number(m[1]);
+    if (this.sign(secret, sid + '|' + slot) !== m[2] || slot > this.slot(now)) return 'invalid';
+    if (now > (slot + 1) * CONFIG.TOKEN_WINDOW_MS + CONFIG.TOKEN_GRACE_MS) return 'expired';
+    return '';
+  },
+  ticket(secret, sid, now = Date.now()) { return `${now}.${this.sign(secret, 'ck|' + sid + '|' + now)}`; },
+  ticketOk(secret, sid, ticket, now = Date.now()) {
+    const [at, sig] = String(ticket || '').split('.');
+    return !!sig && this.sign(secret, 'ck|' + sid + '|' + at) === sig && now - Number(at) <= CONFIG.CHECKIN_TTL_MS && Number(at) <= now + 5000;
+  },
+};
+
+/* =====================================================================
+   5. BUS MASA NYATA — BroadcastChannel (demo) / Supabase Realtime
+   ===================================================================== */
+const Bus = {
+  handlers: new Set(), bc: null, t: null,
+  init() {
+    if (MODE === 'demo') {
+      try { this.bc = new BroadcastChannel('gij-sync'); this.bc.onmessage = () => this.fire(); } catch {}
+      window.addEventListener('storage', (e) => { if (e.key === CONFIG.STORAGE_KEY) this.fire(); });
+    }
+  },
+  /** Panggil selepas setiap tulisan: maklumkan tab lain + tab ini. */
+  notify() { try { this.bc && this.bc.postMessage({ at: Date.now() }); } catch {} this.fire(); },
+  fire() { clearTimeout(this.t); this.t = setTimeout(() => this.handlers.forEach((h) => { try { h(); } catch (e) { console.warn(e); } }), 60); },
+  on(fn) { this.handlers.add(fn); return () => this.handlers.delete(fn); },
+};
+
+/* =====================================================================
+   6. API — satu antara muka, dua pelaksanaan (Local / Supabase)
+   ===================================================================== */
+const LocalAPI = {
+  empty() {
+    return {
+      schemaVersion: CONFIG.SCHEMA_VERSION,
+      settings: { masjidName: 'Masjid Al-Hidayah', pinHash: hashPin(CONFIG.DEFAULT_PIN), tokenSecret: randomSecret(), streak: { threshold: 3, bonus: 2 }, geo: { enabled: false, lat: null, lng: null, radius: 150 } },
+      templates: [], sessions: [], questions: [], participants: [], registrations: [], answers: [], winners: [],
+    };
+  },
+  /** Migrasi v1/v2 → v3 (idempoten). */
+  migrate(d) {
+    const base = this.empty();
+    d = d && typeof d === 'object' ? d : {};
+    d.settings = { ...base.settings, ...(d.settings || {}) };
+    d.settings.streak = { ...base.settings.streak, ...(d.settings.streak || {}) };
+    d.settings.geo = { ...base.settings.geo, ...(d.settings.geo || {}) };
+    if (!d.settings.tokenSecret) d.settings.tokenSecret = base.settings.tokenSecret;
+    ['templates', 'sessions', 'questions', 'participants', 'registrations', 'answers', 'winners'].forEach((k) => { if (!Array.isArray(d[k])) d[k] = []; });
+    const t0 = today();
+    d.templates.forEach((t) => { if (t.answerMinutes == null) t.answerMinutes = Math.min(60, Math.max(1, minutesBetween(t.startTime, t.endTime) || 5)); if (!Array.isArray(t.prizes)) t.prizes = []; });
+    d.sessions.forEach((s) => {
+      if (s.templateId === undefined) s.templateId = null;
+      if (!Array.isArray(s.summary)) s.summary = [];
+      if (!Array.isArray(s.prizes)) s.prizes = [];
+      if (s.transcript == null) s.transcript = '';
+      if (!s.state) { // v2: published + tetingkap masa → keadaan
+        const hasW = d.winners.some((w) => w.sessionId === s.id);
+        s.state = !s.published ? 'draft' : (s.date < t0 || hasW) ? 'done' : 'registration';
+      }
+      delete s.published;
+      if (s.answerMinutes == null) s.answerMinutes = Math.min(60, Math.max(1, minutesBetween(s.startTime, s.endTime) || 5));
+      if (s.questionsCloseAt === undefined) s.questionsCloseAt = null;
+      if (s.questionsOpenedAt === undefined) s.questionsOpenedAt = null;
+      if (!s.stateAt) s.stateAt = s.createdAt || nowISO();
+      if (s.rev == null) s.rev = 0;
+    });
+    d.participants.forEach((p) => { if (!p.secret) p.secret = randomSecret(); });
+    d.registrations.forEach((r) => {
+      if (!r.checkinAt) r.checkinAt = r.createdAt || nowISO();
+      if (r.dist === undefined) r.dist = r.geoDist ?? null;
+      delete r.geoDist; delete r.tokenSlot;
+    });
+    d.winners.forEach((w) => { if (!w.revealAt) w.revealAt = w.createdAt || nowISO(); if (w.spinMs == null) w.spinMs = 0; if (!Array.isArray(w.wheel)) w.wheel = []; });
+    d.schemaVersion = CONFIG.SCHEMA_VERSION;
+    return d;
+  },
+  read() {
+    try {
+      const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      const ver = parsed?.schemaVersion;
+      const d = parsed ? this.migrate(parsed) : this.empty();
+      if (!parsed || ver !== CONFIG.SCHEMA_VERSION) this.persist(d);
+      return d;
+    } catch (e) { console.warn('Data rosak, guna pangkalan kosong', e); return this.empty(); }
+  },
+  persist(d) { try { localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(d)); } catch { toast('Gagal menyimpan data (storan penuh?)', 'error'); } },
+  /** Transaksi: baca data TERKINI, ubah, simpan, maklumkan semua tab. */
+  tx(fn) { const d = this.read(); const r = fn(d); if (!r || r.write !== false) { this.persist(d); Bus.notify(); } return r; },
+  touch(d, sid) { const s = d.sessions.find((x) => x.id === sid); if (s) s.rev = (s.rev || 0) + 1; },
+
+  /* ---------- AJK ---------- */
+  async adminCheck(pin) { return hashPin(pin) === this.read().settings.pinHash; },
+  async isDefaultPin() { return this.read().settings.pinHash === hashPin(CONFIG.DEFAULT_PIN); },
+  async snapshot() { return this.read(); },
+  /** ops: [{t, op:'upsert', row} | {t, op:'delete', id} | {t:'settings', row} | {t:'pin', old, pin}] */
+  async write(ops) {
+    return this.tx((d) => {
+      for (const o of ops) {
+        if (o.t === 'settings') { Object.assign(d.settings, o.row); continue; }
+        if (o.t === 'pin') { if (hashPin(o.old) !== d.settings.pinHash) return { ok: false, write: false, reason: 'PIN semasa salah' }; d.settings.pinHash = hashPin(o.pin); continue; }
+        if (o.t === 'replace') { const keep = d.settings; Object.keys(d).forEach((k) => delete d[k]); Object.assign(d, this.migrate(o.data)); if (o.keepSettings) d.settings = keep; continue; }
+        if (o.t === 'participants') { // padam peserta (cth. permintaan PDPA) beserta rekodnya
+          if (o.op !== 'delete') continue;
+          d.participants = d.participants.filter((p) => p.id !== o.id);
+          ['registrations', 'answers', 'winners'].forEach((k) => { d[k] = d[k].filter((r) => r.participantId !== o.id); });
+          continue;
+        }
+        const list = d[o.t]; if (!Array.isArray(list)) continue;
+        if (o.op === 'delete') {
+          d[o.t] = list.filter((r) => r.id !== o.id);
+          if (o.t === 'sessions') ['questions', 'registrations', 'answers', 'winners'].forEach((k) => { d[k] = d[k].filter((r) => r.sessionId !== o.id); });
+          if (o.t === 'questions') d.answers = d.answers.filter((a) => a.questionId !== o.id);
+        } else {
+          const i = list.findIndex((r) => r.id === o.row.id);
+          if (i >= 0) list[i] = { ...list[i], ...o.row }; else list.push({ createdAt: nowISO(), ...o.row });
+          this.touch(d, o.t === 'sessions' ? o.row.id : o.row.sessionId);
+        }
+      }
+      return { ok: true };
+    });
+  },
+  async setState(sid, to) {
+    return this.tx((d) => {
+      const s = d.sessions.find((x) => x.id === sid);
+      if (!s) return { ok: false, write: false, reason: 'Sesi tidak ditemui' };
+      const err = Logic.transitionError(d, s, to);
+      if (err) return { ok: false, write: false, reason: err };
+      const now = Date.now();
+      s.state = to; s.stateAt = new Date(now).toISOString();
+      if (to === 'questions') { s.questionsOpenedAt = s.stateAt; s.questionsCloseAt = new Date(now + s.answerMinutes * 60000).toISOString(); }
+      if (to === 'closed' && s.questionsCloseAt && Date.parse(s.questionsCloseAt) > now) s.questionsCloseAt = s.stateAt;
+      this.touch(d, sid);
+      return { ok: true };
+    });
+  },
+  async token(sid) { return Token.make(this.read().settings.tokenSecret, sid); },
+  /** Cabutan: pemenang ditentukan DAHULU (rawak adil ikut tiket) → roda berhenti padanya. */
+  async draw(sid) {
+    return this.tx((d) => {
+      const s = d.sessions.find((x) => x.id === sid);
+      if (!s || s.state !== 'drawing') return { ok: false, write: false, reason: 'state' };
+      const ws = Logic.winners(d, sid);
+      const prize = (s.prizes || [])[ws.length];
+      if (!prize) return { ok: false, write: false, reason: 'noprize' };
+      const now = Date.now();
+      if (ws.some((w) => Date.parse(w.revealAt) > now)) return { ok: false, write: false, reason: 'spinning' };
+      const pool = Logic.pool(d, sid);
+      if (!pool.length) return { ok: false, write: false, reason: 'nopool' };
+      const winnerId = pool[randInt(pool.length)];          // berpemberat ikut bilangan tiket
+      const others = shuffle([...new Set(pool)].filter((x) => x !== winnerId)).slice(0, CONFIG.WHEEL_MAX - 1);
+      const wheel = shuffle([winnerId, ...others]);
+      const spinMs = CONFIG.SPIN_MIN_MS + randInt(CONFIG.SPIN_MAX_MS - CONFIG.SPIN_MIN_MS + 1);
+      const w = { id: uid('w_'), sessionId: sid, participantId: winnerId, prize, order: ws.length + 1, spinMs, revealAt: new Date(now + spinMs + 400).toISOString(), wheel, createdAt: new Date(now).toISOString() };
+      d.winners.push(w); this.touch(d, sid);
+      const nameOf = (id) => d.participants.find((p) => p.id === id)?.name || '-';
+      return { ok: true, winner: { ...w, name: nameOf(winnerId) }, wheel: wheel.map((id) => ({ id, name: nameOf(id) })) };
+    });
+  },
+
+  /* ---------- Jemaah ---------- */
+  async checkin(sid, token) {
+    const d = this.read();
+    if (!d.sessions.some((s) => s.id === sid)) return { ok: false, reason: 'notfound' };
+    const err = Token.verify(d.settings.tokenSecret, sid, token);
+    return err ? { ok: false, reason: err } : { ok: true, ticket: Token.ticket(d.settings.tokenSecret, sid) };
+  },
+  /** Carian no. telefon: HANYA nama bertopeng (privasi). */
+  async lookup(phone) { const p = this.read().participants.find((x) => x.phone === phone); return p ? { masked: maskName(p.name) } : null; },
+  /**
+   * Daftar hadir. Peserta sedia ada disahkan dengan SAMA ADA rahsia peranti (peranti yang diingati)
+   * ATAU nama penuh yang sepadan. 5 cubaan nama salah → dikunci 15 minit.
+   */
+  async register({ sid, ticket, name, phone, dist = null, secret = null }) {
+    return this.tx((d) => {
+      const s = d.sessions.find((x) => x.id === sid);
+      if (!s) return { ok: false, write: false, reason: 'notfound' };
+      if (!['registration', 'questions'].includes(s.state)) return { ok: false, write: false, reason: 'closed' };
+      if (!Token.ticketOk(d.settings.tokenSecret, sid, ticket)) return { ok: false, write: false, reason: 'expired' };
+      phone = normalizePhone(phone);
+      if (!isValidPhone(phone)) return { ok: false, write: false, reason: 'phone' };
+      let p = d.participants.find((x) => x.phone === phone);
+      if (!p) {
+        name = String(name || '').trim().replace(/\s+/g, ' ');
+        if (name.length < 3) return { ok: false, write: false, reason: 'name' };
+        p = { id: uid('p_'), name, phone, secret: randomSecret(), nameFails: 0, lockUntil: 0, createdAt: nowISO() };
+        d.participants.push(p);
+      } else if (!secret || secret !== p.secret) {
+        if ((p.lockUntil || 0) > Date.now()) return { ok: false, write: false, reason: 'locked' };
+        const n = normName(name);
+        if (!n || n !== normName(p.name)) {
+          p.nameFails = (p.nameFails || 0) + 1;
+          if (p.nameFails >= NAME_MAX_FAILS) { p.nameFails = 0; p.lockUntil = Date.now() + NAME_LOCK_MS; return { ok: false, reason: 'locked' }; }
+          return { ok: false, reason: 'namemismatch', attemptsLeft: NAME_MAX_FAILS - p.nameFails };
+        }
+        p.nameFails = 0;
+      }
+      let r = d.registrations.find((x) => x.sessionId === sid && x.participantId === p.id);
+      if (!r) {
+        r = { id: uid('r_'), sessionId: sid, participantId: p.id, regNo: d.registrations.filter((x) => x.sessionId === sid).reduce((m, x) => Math.max(m, x.regNo), 0) + 1, checkinAt: nowISO(), dist, createdAt: nowISO() };
+        d.registrations.push(r); this.touch(d, sid);
+      }
+      return { ok: true, participantId: p.id, secret: p.secret, name: p.name, phone: p.phone, regNo: r.regNo };
+    });
+  },
+  async submit({ sid, pid, secret, answers }) {
+    return this.tx((d) => {
+      const s = d.sessions.find((x) => x.id === sid);
+      const p = d.participants.find((x) => x.id === pid && x.secret === secret);
+      if (!s || !p || !d.registrations.some((r) => r.sessionId === sid && r.participantId === pid)) return { ok: false, write: false, reason: 'unverified' };
+      if (d.answers.some((a) => a.sessionId === sid && a.participantId === pid)) return { ok: false, write: false, reason: 'duplicate' };
+      const now = Date.now();
+      if (s.state !== 'questions' || !s.questionsCloseAt || now > Date.parse(s.questionsCloseAt) + CONFIG.ANSWER_GRACE_MS) return { ok: false, write: false, reason: 'closed' };
+      const rows = [];
+      for (const q of Logic.approved(d, sid)) {
+        const ci = Number(answers?.[q.id]);
+        if (answers?.[q.id] === undefined || !Number.isInteger(ci) || ci < 0 || ci > 3) continue;
+        rows.push({ id: uid('a_'), sessionId: sid, participantId: pid, questionId: q.id, choiceIndex: ci, isCorrect: ci === q.correctIndex, createdAt: nowISO() });
+      }
+      if (!rows.length) return { ok: false, write: false, reason: 'empty' };
+      d.answers.push(...rows); this.touch(d, sid);
+      return { ok: true, count: rows.length };
+    });
+  },
+  async jemaahView(sid, pid, secret) { return Logic.jemaahView(this.read(), sid, pid, secret); },
+};
+
+/* ---------- Supabase (RPC — lihat schema.sql). Belum diuji dengan projek sebenar. ---------- */
+const camel = (k) => k.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+const snake = (k) => k.replace(/[A-Z]/g, (c) => '_' + c.toLowerCase());
+const mapKeys = (o, f) => Object.fromEntries(Object.entries(o).map(([k, v]) => [f(k), v]));
+const SupaAPI = {
+  sb: null,
+  async init() {
+    await new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js'; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+    this.sb = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    // Semua skrin langgan perubahan jadual sessions (rev/state dikemas kini oleh setiap RPC)
+    await this.syncClock(); setInterval(() => this.syncClock(), 10 * 60 * 1000);
+    this.sb.channel('gij-sessions').on('postgres_changes', { event: '*', schema: 'public', table: 'sessions' }, () => Bus.fire()).subscribe();
+  },
+  pin() { return SS.get(K.pin) || ''; },
+  async syncClock() {
+    try { const t0 = Date.now(); const v = await this.rpc('gij_jemaah_view', { p_sid: '', p_pid: '', p_secret: '' }); const t1 = Date.now(); if (v && v.now) Clock.offset = v.now - Math.round((t0 + t1) / 2); }
+    catch (e) { console.warn('Gagal segerak jam pelayan', e); }
+  },
+  async rpc(fn, args) { const { data, error } = await this.sb.rpc(fn, args); if (error) throw error; return data; },
+  async adminCheck(pin) { return !!(await this.rpc('gij_admin_check', { p_pin: pin })); },
+  async isDefaultPin() { return false; },
+  async snapshot() {
+    const d = await this.rpc('gij_admin_snapshot', { p_pin: this.pin() });
+    const out = { schemaVersion: 3, settings: d.settings };
+    ['templates', 'sessions', 'questions', 'participants', 'registrations', 'answers', 'winners'].forEach((k) => { out[k] = (d[k] || []).map((r) => mapKeys(r, camel)); });
+    return out;
+  },
+  async write(ops) {
+    const conv = ops.map((o) => (o.row && !['settings'].includes(o.t) ? { ...o, row: mapKeys(o.row, snake) } : o));
+    try { await this.rpc('gij_admin_write', { p_pin: this.pin(), p_ops: conv }); return { ok: true }; } catch (e) { return { ok: false, reason: e.message }; }
+  },
+  async setState(sid, to) { return this.rpc('gij_set_state', { p_pin: this.pin(), p_sid: sid, p_state: to }); },
+  async token(sid) { return this.rpc('gij_token', { p_pin: this.pin(), p_sid: sid }); },
+  async draw(sid) { return this.rpc('gij_draw', { p_pin: this.pin(), p_sid: sid }); },
+  async checkin(sid, token) { return this.rpc('gij_checkin', { p_sid: sid, p_token: token }); },
+  // Lapisan tambahan: papar perkataan pertama sahaja walaupun pelayan memulangkan lebih
+  async lookup(phone) { const n = await this.rpc('gij_lookup', { p_phone: phone }); return n ? { masked: String(n).split(' ')[0] } : null; },
+  async register({ sid, ticket, name, phone, dist = null, secret = null }) { return this.rpc('gij_register', { p_sid: sid, p_ticket: ticket, p_name: name || '', p_phone: normalizePhone(phone), p_dist: dist, p_secret: secret }); },
+  async submit({ sid, pid, secret, answers }) { return this.rpc('gij_submit', { p_sid: sid, p_pid: pid, p_secret: secret, p_answers: answers }); },
+  async jemaahView(sid, pid, secret) { return this.rpc('gij_jemaah_view', { p_sid: sid, p_pid: pid || '', p_secret: secret || '' }); },
+};
+const API = MODE === 'supabase' ? SupaAPI : LocalAPI;
+
+/* ---------- Geolokasi (pilihan) ---------- */
+function haversine(a, b) { const R = 6371000, r = (x) => (x * Math.PI) / 180; const h = Math.sin(r(b.lat - a.lat) / 2) ** 2 + Math.cos(r(a.lat)) * Math.cos(r(b.lat)) * Math.sin(r(b.lng - a.lng) / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
+function getPosition() { return new Promise((res, rej) => { if (!navigator.geolocation) return rej(new Error('x')); navigator.geolocation.getCurrentPosition((p) => res(p.coords), rej, { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }); }); }
+async function checkGeo(g) {
+  if (!g || !g.enabled || g.lat == null || g.lng == null) return { ok: true, dist: null };
+  try {
+    const c = await getPosition();
+    const dist = haversine({ lat: g.lat, lng: g.lng }, { lat: c.latitude, lng: c.longitude });
+    return dist <= Number(g.radius) + Math.min(c.accuracy || 0, 100) ? { ok: true, dist: Math.round(dist) } : { ok: false, msg: `Anda berada kira-kira ${Math.round(dist)} m dari masjid. Pendaftaran hanya dibenarkan dalam radius ${g.radius} m.` };
+  } catch { return { ok: false, msg: 'Lokasi diperlukan untuk mengesahkan kehadiran. Sila benarkan akses lokasi dan cuba lagi.' }; }
+}
+
+/* =====================================================================
+   7. TEMA & AUTH
+   ===================================================================== */
+const Theme = {
+  init() { const t = LS.get(K.theme); if (t) document.documentElement.dataset.theme = t; this.paint(); $('#themeToggle').onclick = () => this.toggle(); },
+  current() { return document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); },
+  toggle() { const n = this.current() === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = n; LS.set(K.theme, n); this.paint(); Charts.redraw(); },
+  paint() { $('#themeToggle').innerHTML = this.current() === 'dark' ? ICON.sun : ICON.moon; },
+};
+const Auth = {
+  ok() { return SS.get(K.admin) === '1'; },
+  async login(pin) { const ok = await API.adminCheck(pin).catch(() => false); if (ok) { SS.set(K.admin, '1'); SS.set(K.pin, pin); } return ok; },
+  logout() { SS.del(K.admin); SS.del(K.pin); },
+};
+async function renderPinGate(app, title) {
+  const isDef = await API.isDefaultPin().catch(() => false);
+  app.innerHTML = `<section class="card gate fade-up">
+    <div class="big-icon gold">${ICON.lock}</div>
+    <h1 style="font-size:1.4rem">${esc(title)}</h1><p class="muted">Masukkan PIN AJK untuk meneruskan.</p>
+    <form id="pinForm" autocomplete="off"><div class="field"><label class="sr-only" for="pin">PIN</label>
+      <input id="pin" class="pin-input" type="password" inputmode="numeric" maxlength="8" placeholder="••••"></div>
+      <button class="btn btn-primary btn-block btn-lg" type="submit">${ICON.lock} Buka</button></form>
+    ${isDef ? `<p class="hint" style="margin-top:14px">PIN lalai: <b>${CONFIG.DEFAULT_PIN}</b> — sila tukar dalam Tetapan.</p>` : ''}
+  </section>`;
+  const input = $('#pin'); input.focus();
+  $('#pinForm').onsubmit = async (e) => {
+    e.preventDefault();
+    if (await Auth.login(input.value.trim())) { toast('Selamat datang, AJK!', 'success'); Router.render(); }
+    else { const c = $('.gate'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake'); input.value = ''; toast('PIN tidak sah', 'error'); }
+  };
+}
+
+/* =====================================================================
+   8. PENJANA SOALAN & RINGKASAN
+   ---------------------------------------------------------------------
+   Jika CONFIG.AI_ENDPOINT diisi → POST { mode:'questions'|'summary', text, count, language:'ms' }
+   Balasan: { questions:[{text, options[4], correctIndex}] } atau { points:[...] }
+   Contoh proksi (Supabase Edge Function) memanggil Claude API (model 'claude-sonnet-5')
+   dengan arahan: "Jana N soalan objektif BM (4 pilihan, 1 betul) daripada teks khutbah,
+   balas JSON sahaja". JANGAN letak API key dalam fail ini. Gagal → fallback asas.
+   ===================================================================== */
+async function callAI(payload) {
+  const r = await fetch(CONFIG.AI_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...payload, language: 'ms' }) });
+  if (!r.ok) throw new Error('HTTP ' + r.status); return r.json();
+}
+async function generateQuestions(text, count = CONFIG.MAX_Q) {
+  count = Math.min(CONFIG.MAX_Q, Math.max(CONFIG.MIN_Q, count));
+  if (CONFIG.AI_ENDPOINT) {
+    try { const d = await callAI({ mode: 'questions', text, count }); const qs = normalizeQuestions(d.questions || d); if (qs.length) return { questions: qs.slice(0, count), source: 'ai' }; }
+    catch (e) { console.warn('API AI gagal, guna fallback', e); toast('API AI tidak dapat dihubungi — guna mod asas', 'error'); }
+  }
+  await sleep(300);
+  return { questions: extractQuestions(text, count), source: 'auto' };
+}
+async function generateSummary(text, count = 4) {
+  if (CONFIG.AI_ENDPOINT) { try { const d = await callAI({ mode: 'summary', text, count }); if (Array.isArray(d.points) && d.points.length) return { points: d.points.map(String).slice(0, 6) }; } catch (e) { console.warn(e); } }
+  return { points: extractSummary(text, count) };
+}
+function normalizeQuestions(list) {
+  if (!Array.isArray(list)) return [];
+  return list.filter((q) => q && q.text && Array.isArray(q.options) && q.options.length >= 4)
+    .map((q) => ({ text: String(q.text).trim(), options: q.options.slice(0, 4).map((o) => String(o).trim()), correctIndex: Math.min(3, Math.max(0, Number(q.correctIndex) || 0)) }));
+}
+const STOPWORDS = new Set(('dan yang di ke dari untuk dengan ini itu ada adalah akan pada dalam kita kami mereka ia dia saya anda telah sudah juga tidak bukan atau oleh kerana maka jika bagi lagi hanya serta supaya agar sebagai para setiap semua boleh perlu hendaklah sesungguhnya wahai tuan puan hadirin sekalian allah swt saw marilah sidang jumaat dirahmati muslimin muslimat antara tersebut iaitu bahawa kepada terhadap daripada seperti ketika apabila selepas sebelum sentiasa banyak sangat lebih paling amat walaupun tetapi namun kemudian menjadi merupakan sesuatu seseorang sendiri sehingga melalui manakala begitu bagaimana mengapa kenapa dimana apakah siapa').split(/\s+/));
+const GENERIC_DISTRACTORS = ['kesabaran', 'keikhlasan', 'ketakwaan', 'kesyukuran', 'keadilan', 'silaturahim', 'istiqamah', 'amanah', 'kejujuran', 'tawaduk', 'muhasabah', 'persaudaraan'];
+const WORD_RE = /[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ'-]*/g;
+const isKeyword = (w) => w.length >= 5 && !STOPWORDS.has(w.toLowerCase()) && !/-$/.test(w);
+function splitSentences(text) { return String(text || '').replace(/\s+/g, ' ').trim().split(/(?<=[.!?؟])\s+/).map((s) => s.trim()).filter((s) => { const n = s.split(' ').length; return n >= 6 && n <= 45; }); }
+function keywordFreq(text) {
+  const freq = new Map(), display = new Map();
+  (String(text).match(WORD_RE) || []).filter(isKeyword).forEach((w) => { const k = w.toLowerCase(); freq.set(k, (freq.get(k) || 0) + 1); if (!display.has(k) || /^[a-z]/.test(display.get(k))) display.set(k, w); });
+  return { freq, display };
+}
+/** Fallback: soalan "isi tempat kosong" daripada ayat penting + 3 pengganggu. */
+function extractQuestions(text, count) {
+  const sentences = splitSentences(text);
+  const { freq, display } = keywordFreq(text);
+  const pool = [...freq.keys()];
+  const isCap = (w) => /^[A-Z]/.test(w || '');
+  const cands = sentences.map((s, idx) => {
+    const words = (s.match(WORD_RE) || []).filter(isKeyword);
+    if (!words.length) return null;
+    const sc = words.map((w) => ({ w, score: Math.min(w.length, 12) + (freq.get(w.toLowerCase()) > 1 ? 3 : 0) + (isCap(w) && s.indexOf(w) > 0 ? 2 : 0) })).sort((a, b) => b.score - a.score);
+    return { s, idx, key: sc[0].w, score: sc[0].score + Math.min(words.length, 6) };
+  }).filter(Boolean);
+  return [...cands].sort((a, b) => b.score - a.score).slice(0, count).sort((a, b) => a.idx - b.idx).map(({ s, key }) => {
+    const kl = key.toLowerCase();
+    const inS = new Set((s.match(WORD_RE) || []).map((w) => w.toLowerCase()));
+    let dis = shuffle(pool.filter((w) => w !== kl && !inS.has(w) && !w.includes('-') && isCap(display.get(w)) === isCap(key) && Math.abs(w.length - key.length) <= 4));
+    if (dis.length < 3) dis = dis.concat(shuffle(GENERIC_DISTRACTORS.filter((w) => w !== kl && !dis.includes(w))));
+    const mc = (w) => { const o = display.get(w) || w; return isCap(key) ? o.charAt(0).toUpperCase() + o.slice(1) : o; };
+    const options = shuffle([key, ...dis.slice(0, 3).map(mc)]);
+    const blanked = s.replace(new RegExp(`\\b${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`), '______');
+    return { text: `Lengkapkan pernyataan daripada khutbah: "${blanked}"`, options, correctIndex: options.indexOf(key) };
+  });
+}
+function extractSummary(text, count = 4) {
+  const { freq } = keywordFreq(text);
+  return splitSentences(text).filter((s) => !/^(sidang|wahai)/i.test(s)).map((s, idx) => {
+    const w = (s.match(WORD_RE) || []).filter(isKeyword);
+    return { s, idx, score: w.reduce((a, x) => a + Math.min(freq.get(x.toLowerCase()) || 1, 3) + (x.length > 7 ? 1 : 0), 0) / Math.sqrt(s.split(' ').length) };
+  }).sort((a, b) => b.score - a.score).slice(0, count).sort((a, b) => a.idx - b.idx)
+    .map(({ s }) => s.replace(/^(marilah kita|oleh itu,?|justeru,?)\s+/i, '').replace(/^./, (c) => c.toUpperCase()));
+}
+/** Jawapan betul yang mudah dibaca (isi tempat kosong → ayat lengkap). */
+function answerLine(text, ans, html = true) {
+  const m = /^Lengkapkan pernyataan daripada khutbah: "(.*)"$/.exec(text);
+  if (m && m[1].includes('______')) return html ? esc(m[1]).replace('______', `<b class="ok-text">${esc(ans)}</b>`) : m[1].replace('______', `*${ans}*`);
+  return html ? `${esc(text)} → <b class="ok-text">${esc(ans)}</b>` : `${text} → *${ans}*`;
+}
+function validateQ(q) {
+  if (!String(q.text || '').trim()) return 'Teks soalan kosong';
+  if (q.options.some((o) => !String(o).trim())) return 'Semua 4 pilihan jawapan mesti diisi';
+  if (new Set(q.options.map((o) => String(o).trim().toLowerCase())).size < 4) return 'Pilihan jawapan tidak boleh berulang';
+  return '';
+}
+
+/* =====================================================================
+   9. POSTER, KONFETI, CARTA, BUNYI & RODA
+   ===================================================================== */
+const Poster = {
+  W: 1080, H: 1350, FONT: '"Plus Jakarta Sans", system-ui, sans-serif', masjid: '',
+  async ready() { try { await Promise.all([document.fonts.load(`800 60px ${this.FONT}`), document.fonts.load(`600 30px ${this.FONT}`)]); } catch {} },
+  rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); },
+  star8(ctx, cx, cy, r) { ctx.beginPath(); for (let i = 0; i < 16; i++) { const a = (i * Math.PI) / 8 - Math.PI / 2, rad = i % 2 ? r * 0.7654 : r; const x = cx + Math.cos(a) * rad, y = cy + Math.sin(a) * rad; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); },
+  text(ctx, s, x, y, { size = 40, weight = 700, color = '#fff', align = 'center', spacing = 0 } = {}) {
+    ctx.font = `${weight} ${size}px ${this.FONT}`; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = 'alphabetic';
+    if ('letterSpacing' in ctx) ctx.letterSpacing = spacing + 'px'; ctx.fillText(s, x, y); if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+  },
+  fit(ctx, s, maxW, size, weight = 800, min = 30) { while (size > min) { ctx.font = `${weight} ${size}px ${this.FONT}`; if (ctx.measureText(s).width <= maxW) break; size -= 2; } return size; },
+  base(ctx) {
+    const { W, H } = this;
+    const g = ctx.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#064e3b'); g.addColorStop(.55, '#065f46'); g.addColorStop(1, '#022c22');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    const rg = ctx.createRadialGradient(W / 2, H * .25, 40, W / 2, H * .25, 720); rg.addColorStop(0, 'rgba(240,209,138,.22)'); rg.addColorStop(1, 'rgba(240,209,138,0)');
+    ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
+    ctx.save(); ctx.strokeStyle = 'rgba(240,209,138,.08)'; ctx.lineWidth = 2;
+    for (let y = 0; y < H + 135; y += 135) for (let x = (y / 135) % 2 ? 67 : 0; x < W + 135; x += 135) { this.star8(ctx, x, y, 44); ctx.stroke(); }
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(240,209,138,.75)'; ctx.lineWidth = 3; this.rr(ctx, 36, 36, W - 72, H - 72, 30); ctx.stroke();
+  },
+  async winner(sess, name, prize) {
+    await this.ready();
+    const c = document.createElement('canvas'); c.width = this.W; c.height = this.H; const ctx = c.getContext('2d'); const W = this.W;
+    this.base(ctx);
+    for (let i = 0; i < 70; i++) { ctx.fillStyle = ['rgba(240,209,138,.8)', 'rgba(255,255,255,.55)', 'rgba(52,211,153,.6)'][i % 3]; ctx.save(); ctx.translate(80 + Math.random() * (W - 160), 80 + Math.random() * 420); ctx.rotate(Math.random() * 3); ctx.fillRect(-6, -3, 12, 6); ctx.restore(); }
+    this.text(ctx, 'GANJARAN ILMU JEMAAH', W / 2, 140, { size: 28, color: '#f0d18a', spacing: 8 });
+    this.text(ctx, this.masjid, W / 2, 190, { size: 34, weight: 600, color: '#d1fae5' });
+    const tg = ctx.createLinearGradient(0, 260, 0, 380); tg.addColorStop(0, '#fbe7b0'); tg.addColorStop(1, '#d4af5f');
+    this.text(ctx, 'TAHNIAH!', W / 2, 370, { size: 150, weight: 800, color: tg });
+    this.text(ctx, 'Pemenang Cabutan Ganjaran Ilmu', W / 2, 440, { size: 34, weight: 600, color: '#d1fae5' });
+    this.text(ctx, name, W / 2, 560, { size: this.fit(ctx, name, W - 200, 84), weight: 800 });
+    const pw = Math.min(W - 200, (ctx.font = `800 40px ${this.FONT}`, ctx.measureText('🎁 ' + prize).width + 120));
+    const pg = ctx.createLinearGradient(W / 2 - pw / 2, 0, W / 2 + pw / 2, 0); pg.addColorStop(0, '#f5dc9c'); pg.addColorStop(1, '#c69c47');
+    ctx.fillStyle = pg; this.rr(ctx, W / 2 - pw / 2, 610, pw, 96, 48); ctx.fill();
+    this.text(ctx, '🎁 ' + prize, W / 2, 672, { size: this.fit(ctx, '🎁 ' + prize, pw - 60, 40, 800, 24), weight: 800, color: '#2b2006' });
+    ctx.fillStyle = 'rgba(255,255,255,.07)'; this.rr(ctx, 110, 770, W - 220, 250, 28); ctx.fill();
+    [['SESI', sess.title], ['PENCERAMAH', sess.speaker || '-'], ['TARIKH', fmtDate(sess.date)]].forEach(([k, v], i) => {
+      this.text(ctx, k, 154, 836 + i * 64, { size: 18, color: '#f0d18a', align: 'left', spacing: 3 });
+      let val = String(v); ctx.font = `600 30px ${this.FONT}`; while (ctx.measureText(val).width > W - 320 && val.length > 4) val = val.slice(0, -2);
+      this.text(ctx, val, 330, 836 + i * 64, { size: 30, weight: 600, align: 'left' });
+    });
+    this.text(ctx, 'Semoga terus istiqamah memakmurkan masjid.', W / 2, 1120, { size: 30, weight: 600, color: '#f0d18a' });
+    this.text(ctx, 'Sila hubungi AJK masjid untuk tuntutan hadiah', W / 2, this.H - 118, { size: 24, weight: 500, color: '#a7d7c2' });
+    this.text(ctx, 'Penyertaan adalah PERCUMA', W / 2, this.H - 80, { size: 22, color: '#f0d18a', spacing: 2 });
+    return c;
+  },
+  download(c, f) { c.toBlob((b) => downloadBlob(b, f), 'image/png'); },
+  async share(c, f, text) {
+    try { const b = await new Promise((r) => c.toBlob(r, 'image/png')); const file = new File([b], f, { type: 'image/png' }); if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text }); return true; } } catch (e) { if (e.name !== 'AbortError') console.warn(e); }
+    return false;
+  },
+  canShareFiles() { try { return !!(navigator.canShare && navigator.canShare({ files: [new File([''], 'a.png', { type: 'image/png' })] })); } catch { return false; } },
+};
+
+function confetti(duration = 3500) {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const c = document.createElement('canvas'); c.className = 'confetti-canvas'; (document.fullscreenElement || document.body).appendChild(c);
+  const ctx = c.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
+  c.width = innerWidth * dpr; c.height = innerHeight * dpr; ctx.scale(dpr, dpr);
+  const colors = ['#f0d18a', '#d4af5f', '#10b981', '#34d399', '#ffffff', '#fbe7b0'];
+  const parts = Array.from({ length: 200 }, () => ({ x: innerWidth / 2 + (Math.random() - .5) * 240, y: innerHeight * .4, vx: (Math.random() - .5) * 18, vy: -Math.random() * 17 - 4, w: 6 + Math.random() * 8, h: 4 + Math.random() * 6, r: Math.random() * 3, vr: (Math.random() - .5) * .3, c: colors[randInt(colors.length)] }));
+  const t0 = performance.now();
+  (function f(t) {
+    const el = t - t0; ctx.clearRect(0, 0, innerWidth, innerHeight); ctx.globalAlpha = Math.max(0, 1 - el / duration);
+    for (const p of parts) { p.vy += .35; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore(); }
+    if (el < duration) requestAnimationFrame(f); else c.remove();
+  })(t0);
+}
+
+/** Carta bar bertindan (Canvas). */
+const Charts = {
+  list: [],
+  reset() { this.list = []; },
+  redraw() { this.list = this.list.filter((c) => c.canvas.isConnected); this.list.forEach((c) => this.draw(c.canvas, c.cfg)); },
+  bar(canvas, cfg) { this.list.push({ canvas, cfg }); this.draw(canvas, cfg); },
+  draw(canvas, { labels, series }) {
+    const css = getComputedStyle(document.documentElement), v = (n) => css.getPropertyValue(n).trim();
+    const dpr = Math.min(2, devicePixelRatio || 1), W = canvas.clientWidth || 300, H = canvas.clientHeight || 280;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    const ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    const pad = { l: 40, r: 10, t: 22, b: 44 }, pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
+    const totals = labels.map((_, i) => series.reduce((s, se) => s + (se.values[i] || 0), 0));
+    const max = Math.max(4, ...totals), raw = max / 4, mag = 10 ** Math.floor(Math.log10(raw));
+    const step = [1, 2, 5, 10].map((m) => m * mag).find((x) => x >= raw), top = step * 4;
+    ctx.font = `600 13px ${Poster.FONT}`; ctx.textBaseline = 'middle';
+    for (let i = 0; i <= 4; i++) { const y = pad.t + ph - (ph * i) / 4; ctx.strokeStyle = v('--border'); ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke(); ctx.fillStyle = v('--muted'); ctx.textAlign = 'right'; ctx.fillText(String(step * i), pad.l - 8, y); }
+    if (!labels.length) { ctx.textAlign = 'center'; ctx.fillText('Tiada data', W / 2, H / 2); return; }
+    const band = pw / labels.length, bw = Math.min(46, band * .62);
+    labels.forEach((lab, i) => {
+      const x = pad.l + band * i + (band - bw) / 2; let y = pad.t + ph;
+      series.forEach((se) => { const h = ((se.values[i] || 0) / top) * ph; if (h > 0) { ctx.fillStyle = v(se.color); ctx.fillRect(x, y - h, bw, h); } y -= h; });
+      ctx.fillStyle = v('--text'); ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; if (totals[i]) ctx.fillText(String(totals[i]), x + bw / 2, y - 4);
+      ctx.fillStyle = v('--muted'); ctx.textBaseline = 'top'; ctx.fillText(lab, x + bw / 2, pad.t + ph + 10); ctx.textBaseline = 'middle';
+    });
+  },
+};
+window.addEventListener('resize', debounce(() => Charts.redraw(), 200));
+
+/** Bunyi "tik" roda (WebAudio, boleh dimatikan). */
+const Sound = {
+  ctx: null,
+  get on() { return LS.get(K.sound, true) !== false; },
+  set on(v) { LS.set(K.sound, !!v); },
+  tick() {
+    if (!this.on) return;
+    try {
+      this.ctx = this.ctx || new (window.AudioContext || window.webkitAudioContext)();
+      const t = this.ctx.currentTime, o = this.ctx.createOscillator(), g = this.ctx.createGain();
+      o.type = 'square'; o.frequency.value = 1500; g.gain.setValueAtTime(.06, t); g.gain.exponentialRampToValueAtTime(.0001, t + .03);
+      o.connect(g).connect(this.ctx.destination); o.start(t); o.stop(t + .035);
+    } catch {}
+  },
+};
+
+/**
+ * RODA CABUTAN (Canvas). Penunjuk di atas (−90°). Segmen i meliputi [i·a, (i+1)·a) dalam
+ * koordinat roda; roda dilukis berputar `rot`. Segmen di bawah penunjuk dikira semula
+ * daripada sudut akhir dan disimpan pada canvas.dataset.landed (untuk pengesahan/ujian).
+ */
+const Wheel = {
+  COLORS: [['#047857', '#ffffff'], ['#d4af5f', '#1b1405'], ['#ffffff', '#064e3b']],
+  draw(canvas, segs, rot) {
+    const dpr = Math.min(2, devicePixelRatio || 1), S = canvas.clientWidth || 600;
+    if (canvas.width !== S * dpr) { canvas.width = S * dpr; canvas.height = S * dpr; }
+    const ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, S, S);
+    const c = S / 2, R = S / 2 - 10, n = Math.max(1, segs.length), a = (Math.PI * 2) / n;
+    ctx.save(); ctx.translate(c, c);
+    ctx.beginPath(); ctx.arc(0, 0, R + 8, 0, Math.PI * 2); ctx.fillStyle = '#f0d18a'; ctx.fill();
+    ctx.rotate(rot);
+    if (!segs.length) { ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.fillStyle = '#0a3b2e'; ctx.fill(); }
+    segs.forEach((sg, i) => {
+      let [bg, fg] = this.COLORS[i % 3];
+      if (i === n - 1 && n % 3 === 1 && n > 1) [bg, fg] = ['#10b981', '#02130c']; // elak warna sama bersebelahan
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, R, i * a, (i + 1) * a); ctx.closePath();
+      ctx.fillStyle = bg; ctx.fill(); ctx.strokeStyle = 'rgba(2,44,34,.35)'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.save(); ctx.rotate(i * a + a / 2); ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = fg;
+      const fs = Math.max(10, Math.min(26, (S / 2) * a * .55, S / 26));
+      ctx.font = `700 ${fs}px ${Poster.FONT}`;
+      let name = sg.name; const maxW = R * .66;
+      while (ctx.measureText(name).width > maxW && name.length > 3) name = name.slice(0, -2);
+      if (name !== sg.name) name = name.trimEnd() + '…';
+      ctx.fillText(name, R - 16, 0); ctx.restore();
+    });
+    ctx.restore();
+    ctx.beginPath(); ctx.arc(c, c, S * .09, 0, Math.PI * 2); ctx.fillStyle = '#064e3b'; ctx.fill(); ctx.lineWidth = 5; ctx.strokeStyle = '#f0d18a'; ctx.stroke();
+    Poster.star8(ctx, c, c, S * .05); ctx.fillStyle = '#f0d18a'; ctx.fill();
+  },
+  indexAt(n, rot) { const a = (Math.PI * 2) / n; let th = (-Math.PI / 2 - rot) % (Math.PI * 2); if (th < 0) th += Math.PI * 2; return Math.floor(th / a) % n; },
+  /** Putar sehingga penunjuk berhenti tepat pada segmen targetIdx. */
+  spin(canvas, segs, targetIdx, ms, fromRot = 0) {
+    return new Promise((resolve) => {
+      const n = segs.length, a = (Math.PI * 2) / n, TAU = Math.PI * 2;
+      const off = (Math.random() - .5) * .6 * a;                       // kedudukan rawak DALAM segmen
+      const targetTh = targetIdx * a + a / 2 + off;
+      let endRot = -Math.PI / 2 - targetTh;
+      const turns = 6 + randInt(3);
+      endRot = endRot - Math.ceil((endRot - fromRot) / TAU) * TAU + turns * TAU; // sentiasa ke hadapan
+      const t0 = performance.now(); let lastIdx = this.indexAt(n, fromRot);
+      const ease = (t) => 1 - Math.pow(1 - t, 4);                      // easeOutQuart
+      const frame = (t) => {
+        const p = Math.min(1, (t - t0) / ms), rot = fromRot + (endRot - fromRot) * ease(p);
+        this.draw(canvas, segs, rot);
+        const idx = this.indexAt(n, rot); if (idx !== lastIdx) { lastIdx = idx; Sound.tick(); }
+        if (p < 1 && canvas.isConnected) requestAnimationFrame(frame);
+        else { this.draw(canvas, segs, endRot); const li = this.indexAt(n, endRot); canvas.dataset.landed = segs[li].id; canvas.dataset.rot = String(endRot % TAU); resolve({ rot: endRot % TAU, landed: segs[li] }); }
+      };
+      requestAnimationFrame(frame);
+    });
+  },
+};
+
+/* =====================================================================
+   10. PENGHALA (#j #admin #skrin)
+   ===================================================================== */
+const Views = {};
+const Router = {
+  current: '', timers: [], dataHandler: null, seq: 0,
+  parse() { const h = decodeURIComponent(location.hash.slice(1)) || 'j'; const [path, qs = ''] = h.split('?'); return { path, params: Object.fromEntries(new URLSearchParams(qs)) }; },
+  cleanup() { this.timers.forEach((t) => { clearInterval(t); clearTimeout(t); }); this.timers = []; this.dataHandler = null; Charts.reset(); },
+  render() {
+    this.cleanup(); this.seq++;
+    let { path, params } = this.parse();
+    if (!Views[path]) path = 'j';
+    if (this.current === 'skrin' && path !== 'skrin' && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    this.current = path;
+    document.body.className = 'mode-' + path;
+    $('#topExtra').innerHTML = MODE === 'demo' && path === 'admin' ? '<span class="demo-pill" title="Data dalam pelayar ini sahaja">MOD DEMO</span>' : '';
+    const app = $('#app'); app.innerHTML = ''; app.className = 'fade-up'; void app.offsetWidth;
+    Views[path](app, params);
+  },
+  /** Pastikan hasil async masih untuk paparan semasa. */
+  alive() { const s = this.seq; return () => s === this.seq; },
+};
+function every(ms, fn) { const t = setInterval(fn, ms); Router.timers.push(t); return t; }
+function later(ms, fn) { const t = setTimeout(fn, Math.max(0, ms)); Router.timers.push(t); return t; }
+Bus.on(() => Router.dataHandler && Router.dataHandler());
+
+/* =====================================================================
+   11. UI JEMAAH (#j) — mesin skrin automatik
+   ===================================================================== */
+const J = {
+  app: null, view: null, key: null, flash: null, busy: false, again: false, timer: null, offset: 0, submitting: false,
+  sid() { return LS.get(K.current); },
+  me() { return LS.get(K.me); },
+  checkin() { const c = LS.get(K.checkin); return c && c.sid === this.sid() && Date.now() - c.at < CONFIG.CHECKIN_TTL_MS ? c : null; },
+  now() { return Date.now() + this.offset; },
+  async refresh() {
+    if (this.busy) { this.again = true; return; }
+    this.busy = true;
+    const alive = Router.alive();
+    try {
+      const sid = this.sid(); const me = this.me();
+      this.view = sid ? await API.jemaahView(sid, me?.participantId, me?.secret) : null;
+      if (!alive()) return;
+      if (this.view) this.offset = this.view.now - Date.now();
+      if (me && this.view?.ok && !this.view.knownDevice) { LS.del(K.me); } // peranti tidak lagi dikenali
+      if (this.view?.masjidName) paintBrand(this.view.masjidName);
+      this.show();
+      this.schedule();
+    } catch (e) { console.warn(e); }
+    finally { this.busy = false; if (this.again) { this.again = false; this.refresh(); } }
+  },
+  /** Tentukan skrin semasa daripada keadaan sesi & peserta. */
+  screen(v) {
+    if (!this.sid()) return 'scan';
+    if (!v) return 'scan';
+    if (!v.ok) return 'notfound';
+    const st = v.session.state;
+    if (!v.registered) {
+      if (this.flash) return 'tokenbad';
+      if (st === 'draft') return 'belumbuka';
+      if (!['registration', 'questions'].includes(st)) return 'tutup';
+      return this.checkin() ? 'daftar' : 'scan';
+    }
+    if (v.win) return 'tahniah';
+    if (st === 'draft' || st === 'registration') return 'tunggu_soalan';
+    if (v.questions && v.questions.length) return 'soalan';
+    if (st === 'done') return 'belum';
+    return 'tunggu_cabutan';
+  },
+  show() {
+    const v = this.view, sc = this.screen(v);
+    const key = ['daftar', 'soalan'].includes(sc) ? sc + '|' + (v?.session?.id || '') : `${sc}|${v?.session?.state}|${v?.tickets}|${v?.win?.prize}|${v?.review ? 1 : 0}|${v?.streak}`;
+    if (key === this.key) return;
+    this.key = key;
+    clearInterval(this.qTimer);
+    this.app.innerHTML = `<div class="jwrap fade-up" data-screen="${sc}">${this.screens[sc] ? '' : ''}</div>`;
+    const w = $('.jwrap', this.app);
+    this.screens[sc].call(this, w, v);
+    window.scrollTo({ top: 0 });
+  },
+  /** Muat semula tepat pada masa penting (tamat soalan / keputusan didedahkan). */
+  schedule() {
+    clearTimeout(this.timer);
+    const v = this.view; if (!v?.ok) return;
+    const t = [];
+    if (v.session.state === 'questions' && v.session.questionsCloseAt) t.push(Date.parse(v.session.questionsCloseAt) + 300);
+    if (v.pendingRevealAt) t.push(v.pendingRevealAt + 150);
+    const next = t.filter((x) => x > this.now()).sort((a, b) => a - b)[0];
+    if (next) { this.timer = later(next - this.now(), () => { this.key = null; this.refresh(); }); }
+  },
+  head(v) { return v?.session ? `<div class="session-chip">${esc(v.session.title)} · ${esc(fmtDateShort(v.session.date))}</div>` : ''; },
+  reviewHTML(v) {
+    if (!v.review) return `<section class="card center"><p class="muted" style="margin:0">${ICON.book.replace('<svg', '<svg style="width:22px;height:22px;vertical-align:-5px"')} Jawapan betul & ringkasan ilmu akan dipaparkan selepas sesi tamat.</p></section>`;
+    const pts = v.review.summary.filter(Boolean);
+    const text = [`📚 *Ringkasan Ilmu — ${v.session.title}*`, fmtDate(v.session.date), '', ...(pts.length ? ['*Poin utama:*', ...pts.map((p) => '• ' + p), ''] : []), '*Jawapan betul:*', ...v.review.items.map((it, i) => `${i + 1}. ${answerLine(it.text, it.answer, false)}`), '', `${v.masjidName} · ${CONFIG.APP_NAME}`, 'Penyertaan PERCUMA — jom hadir sesi seterusnya! 🤲'].join('\n');
+    return `<section class="card accent" style="text-align:left">
+      <h2>Ringkasan Ilmu</h2>
+      ${pts.length ? `<ol class="points">${pts.map((p) => `<li>${esc(p)}</li>`).join('')}</ol>` : ''}
+      <h3 style="margin-top:14px">Jawapan Betul</h3>
+      ${v.review.items.map((it, i) => `<div class="review-item"><b>${i + 1}.</b> ${answerLine(it.text, it.answer)}
+        <div class="small">${it.mine == null ? '<span class="muted">Tidak dijawab</span>' : it.correct ? `<span class="ok-text">✓ Jawapan anda betul</span>` : `<span class="bad-text">✗ Jawapan anda: ${esc(it.mine)}</span>`}</div></div>`).join('')}
+      <a class="btn btn-wa btn-block" style="margin-top:14px" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(text)}">${ICON.whatsapp} Kongsi Ringkasan via WhatsApp</a>
+    </section>`;
+  },
+  screens: {
+    scan(w) {
+      w.innerHTML = `<section class="card jscreen">
+        <div class="big-icon">${ICON.qr}</div>
+        <h1>Imbas Kod QR</h1>
+        <p>Imbas kod QR pada <b>skrin besar di dalam masjid</b> menggunakan kamera telefon untuk mendaftar kehadiran.</p>
+        <span class="free-pill">✓ Penyertaan PERCUMA</span>
+      </section>`;
+    },
+    tokenbad(w) {
+      const expired = this.flash === 'expired';
+      w.innerHTML = `<section class="card jscreen">
+        <div class="big-icon gold">${ICON.alert}</div>
+        <h1>${expired ? 'Kod QR telah tamat tempoh' : 'Kod QR tidak sah'}</h1>
+        <p>Kod QR bertukar setiap 60 saat supaya hanya jemaah yang hadir boleh mendaftar. Sila <b>imbas semula</b> kod QR di skrin masjid.</p>
+      </section>`;
+    },
+    notfound(w) { w.innerHTML = `<section class="card jscreen"><div class="big-icon gold">${ICON.info}</div><h1>Sesi tidak ditemui</h1><p>Sila imbas semula kod QR di skrin masjid.</p></section>`; },
+    belumbuka(w, v) { w.innerHTML = `<section class="card jscreen">${this.head(v)}<div class="big-icon hourglass">${ICON.hourglass}</div><h1>Pendaftaran belum dibuka</h1><p>Sila tunggu arahan AJK. Skrin ini akan bertukar secara automatik.</p><div class="dots"><i></i><i></i><i></i></div></section>`; },
+    tutup(w, v) { w.innerHTML = `<section class="card jscreen">${this.head(v)}<div class="big-icon gold">${ICON.lock}</div><h1>Pendaftaran telah ditutup</h1><p>Jumpa lagi pada sesi akan datang. Penyertaan adalah percuma!</p></section>${v.review ? this.reviewHTML(v) : ''}`; },
+    daftar(w, v) {
+      const me = this.me();
+      const doRegister = async (btn, phone, name, secret = null) => {
+        btn.disabled = true; const lbl = btn.innerHTML; btn.innerHTML = 'Mengesahkan…';
+        const geo = await checkGeo(v.geo);
+        if (!geo.ok) { btn.disabled = false; btn.innerHTML = lbl; return openModal({ title: 'Lokasi tidak disahkan', html: `<p>${esc(geo.msg)}</p>` }); }
+        const ck = this.checkin();
+        if (!ck) { toast('Pengesahan QR telah tamat. Sila imbas semula.', 'error'); this.key = null; return this.refresh(); }
+        const r = await API.register({ sid: v.session.id, ticket: ck.ticket, name, phone, dist: geo.dist, secret }).catch((e) => ({ ok: false, reason: e.message }));
+        if (!r.ok) {
+          btn.disabled = false; btn.innerHTML = lbl;
+          if (r.reason === 'namemismatch' || r.reason === 'locked') {
+            const m = r.reason === 'locked' ? 'Terlalu banyak cubaan. Sila cuba lagi selepas 15 minit atau minta bantuan AJK.' : `Nama tidak sepadan dengan rekod (baki ${r.attemptsLeft} cubaan). Taip nama penuh seperti semasa mendaftar kali pertama.`;
+            if ($('#fConf')) { setFieldError('#fConf', m); $('#confName').focus(); } else toast(m, 'error');
+            if (secret && r.reason === 'namemismatch') { LS.del(K.me); form(); } // rahsia peranti tidak lagi sah
+            return;
+          }
+          const msg = { closed: 'Pendaftaran telah ditutup.', expired: 'Pengesahan QR telah tamat — sila imbas semula.', phone: 'No. telefon tidak sah.', name: 'Sila isi nama penuh.' }[r.reason] || 'Pendaftaran gagal. Cuba lagi.';
+          toast(msg, 'error'); if (r.reason === 'expired') LS.del(K.checkin);
+          this.key = null; return this.refresh();
+        }
+        LS.set(K.me, { participantId: r.participantId, secret: r.secret, name: r.name, phone: r.phone });
+        toast('Kehadiran disahkan!', 'success');
+        this.key = null; this.refresh();
+      };
+      /* Peranti yang diingati: dikenali dengan rahsia peranti — satu ketik sahaja */
+      const welcome = (m) => {
+        w.innerHTML = `<section class="card jscreen">${this.head(v)}
+          <div class="big-icon">${ICON.user}</div>
+          <h1>Selamat kembali,<br>${esc(m.name)}!</h1>
+          <p>Anda sudah berdaftar. Tidak perlu isi maklumat lagi.</p>
+          <button class="btn btn-primary btn-lg btn-block" id="btnHadir">${ICON.check} Sahkan Kehadiran Saya</button>
+          <button class="link-btn" id="btnBukan">Bukan saya — guna nombor lain</button>
+        </section>`;
+        $('#btnHadir').onclick = (e) => doRegister(e.currentTarget, m.phone, '', m.secret);
+        $('#btnBukan').onclick = () => { LS.del(K.me); form(); };
+      };
+      /* Peranti baharu + nombor lama: papar nama BERTOPENG sahaja, minta nama penuh sebagai pengesahan */
+      const confirmName = (masked, phone, raw) => {
+        w.innerHTML = `<section class="card jscreen" style="text-align:left">${this.head(v)}
+          <div class="big-icon">${ICON.lock}</div>
+          <h1 class="center">Rekod ditemui</h1>
+          <p class="center">No. <b>${esc(maskPhone(phone))}</b> berdaftar atas nama <b id="maskedName">${esc(masked)}</b>.</p>
+          <p class="center small">Untuk keselamatan, sila taip <b>nama penuh</b> anda seperti semasa mendaftar kali pertama.</p>
+          <form id="regForm" novalidate>
+            <div class="field" id="fConf"><label for="confName">Nama penuh</label><input id="confName" autocomplete="name" maxlength="80" placeholder="cth. Ahmad bin Abdullah"><span class="error hidden" role="alert"></span></div>
+            <button class="btn btn-primary btn-lg btn-block" type="submit">${ICON.check} Sahkan & Daftar Hadir</button>
+            <button class="link-btn" type="button" id="btnTukar">← Tukar no. telefon</button>
+          </form>
+        </section>`;
+        $('#confName').focus();
+        $('#btnTukar').onclick = () => form(raw);
+        $('#regForm').onsubmit = (e) => {
+          e.preventDefault();
+          const name = $('#confName').value.trim().replace(/\s+/g, ' ');
+          if (name.length < 3) { setFieldError('#fConf', 'Sila taip nama penuh anda.'); return $('#confName').focus(); }
+          setFieldError('#fConf', '');
+          doRegister(e.submitter || $('#regForm button[type=submit]'), phone, name);
+        };
+      };
+      const form = (phoneVal = '', askName = false) => {
+        w.innerHTML = `<section class="card jscreen" style="text-align:left">${this.head(v)}
+          <h1 class="center">${askName ? 'Kali pertama? Selamat datang!' : 'Daftar Kehadiran'}</h1>
+          <p class="center">${askName ? 'Isi nama anda <b>sekali sahaja</b>. Sesi seterusnya cukup dengan no. telefon.' : 'Masukkan no. WhatsApp anda. Jika pernah daftar, anda akan dikenali terus.'}</p>
+          <form id="regForm" novalidate>
+            <div class="field" id="fPhone"><label for="phone">No. telefon bimbit (WhatsApp)</label>
+              <input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="cth. 012-345 6789" maxlength="16" value="${esc(phoneVal)}" ${askName ? 'readonly' : ''}>
+              <span class="error hidden" role="alert"></span></div>
+            ${askName ? `<div class="field" id="fName"><label for="name">Nama penuh</label><input id="name" autocomplete="name" maxlength="80" placeholder="cth. Ahmad bin Abdullah"><span class="error hidden" role="alert"></span></div>` : ''}
+            <p class="hint">Pastikan nombor aktif di WhatsApp — pemenang dihubungi melalui WhatsApp.</p>
+            <button class="btn btn-primary btn-lg btn-block" type="submit">${askName ? `${ICON.check} Daftar & Sahkan Hadir` : `Teruskan ${ICON.arrow}`}</button>
+            ${askName ? '<button class="link-btn" type="button" id="btnTukar">← Tukar no. telefon</button>' : ''}
+          </form>
+          <p class="center" style="margin:12px 0 0"><span class="free-pill">✓ Penyertaan PERCUMA</span></p>
+        </section>`;
+        (askName ? $('#name') : $('#phone')).focus();
+        if (askName) $('#btnTukar').onclick = () => form();
+        $('#regForm').onsubmit = async (e) => {
+          e.preventDefault();
+          const raw = $('#phone').value.trim(), phone = normalizePhone(raw);
+          const perr = !raw ? 'Sila masukkan no. telefon.' : !isValidPhone(phone) ? 'Format tidak sah. Guna no. telefon bimbit Malaysia bermula 01X (10–11 digit), cth. 012-345 6789.' : '';
+          setFieldError('#fPhone', perr); if (perr) return $('#phone').focus();
+          if (!askName) {
+            const found = await API.lookup(phone).catch(() => null);
+            if (found) return confirmName(found.masked, phone, raw);
+            return form(raw, true);
+          }
+          const name = $('#name').value.trim().replace(/\s+/g, ' ');
+          const nerr = !name ? 'Sila masukkan nama penuh.' : name.length < 3 ? 'Nama terlalu pendek (min. 3 aksara).' : !/[A-Za-zÀ-ÿ]/.test(name) ? 'Nama mesti mengandungi huruf.' : '';
+          setFieldError('#fName', nerr); if (nerr) return $('#name').focus();
+          doRegister(e.submitter || $('#regForm button[type=submit]'), phone, name);
+        };
+      };
+      if (me && me.phone && me.secret) welcome(me); else form();
+    },
+    tunggu_soalan(w, v) {
+      w.innerHTML = `<section class="card jscreen">${this.head(v)}
+        <div class="big-icon hourglass">${ICON.hourglass}</div>
+        <h1>Menunggu soalan…</h1>
+        <p>Assalamualaikum <b>${esc(v.name)}</b>. Kehadiran anda disahkan (No. #${String(v.regNo).padStart(4, '0')}).<br>Dengar khutbah dengan teliti — soalan akan muncul secara automatik.</p>
+        ${v.streak ? `<div class="badges"><span class="streak">🔥 ${v.streak} sesi berturut-turut</span>${v.bonus ? `<span class="medal-badge">+${v.bonus} tiket bonus</span>` : ''}</div>` : ''}
+        <div class="dots"><i></i><i></i><i></i></div>
+      </section>`;
+    },
+    soalan(w, v) {
+      const qs = v.questions, sid = v.session.id, dk = K.draft(sid);
+      const draft = LS.get(dk, { idx: 0, choices: {} });
+      let idx = Math.min(draft.idx || 0, qs.length - 1);
+      const closeAt = Date.parse(v.session.questionsCloseAt);
+      const submit = async (auto) => {
+        if (this.submitting) return; this.submitting = true;
+        const me = this.me();
+        const r = await API.submit({ sid, pid: me.participantId, secret: me.secret, answers: draft.choices }).catch((e) => ({ ok: false, reason: e.message }));
+        this.submitting = false;
+        if (r.ok || r.reason === 'duplicate' || r.reason === 'closed') LS.del(dk);
+        if (!r.ok) {
+          if (r.reason === 'empty') { if (!auto) return toast('Sila jawab sekurang-kurangnya satu soalan', 'error'); }
+          else if (r.reason === 'closed') toast('Masa telah tamat — jawapan tidak diterima', 'error');
+          else if (r.reason === 'duplicate') toast('Jawapan anda sudah dihantar sebelum ini');
+        } else toast('Jawapan dihantar. Semoga berjaya!', 'success');
+        this.key = null; this.refresh();
+      };
+      const paint = () => {
+        const q = qs[idx], chosen = draft.choices[q.id], last = idx === qs.length - 1;
+        w.innerHTML = `
+          <div class="timer-bar" id="timerBar"><span>Soalan <b>${idx + 1}</b> / ${qs.length}</span><span class="time" id="timeLeft">--:--</span></div>
+          <div class="progress" aria-hidden="true"><i style="width:${((idx + (chosen !== undefined ? 1 : 0)) / qs.length) * 100}%"></i></div>
+          <section class="card fade-up">
+            <h2 class="q-text">${esc(q.text)}</h2>
+            <div class="opts" role="radiogroup" aria-label="Pilihan jawapan">
+              ${q.options.map((o, pos) => `<button type="button" class="opt ${chosen === o.i ? 'sel' : ''}" role="radio" aria-checked="${chosen === o.i}" data-i="${o.i}"><span class="opt-key">${'ABCD'[pos]}</span><span>${esc(o.text)}</span></button>`).join('')}
+            </div>
+          </section>
+          <div class="nav-row">
+            ${idx > 0 ? `<button class="btn btn-ghost btn-lg" id="prevQ">← Kembali</button>` : ''}
+            <button class="btn ${last ? 'btn-gold' : 'btn-primary'} btn-lg" id="nextQ" ${chosen === undefined ? 'disabled' : ''}>${last ? `${ICON.check} Hantar Jawapan` : 'Seterusnya →'}</button>
+          </div>`;
+        $$('.opt', w).forEach((b) => b.onclick = () => {
+          draft.choices[q.id] = +b.dataset.i; draft.idx = idx; LS.set(dk, draft);
+          $$('.opt', w).forEach((x) => { const s = x === b; x.classList.toggle('sel', s); x.setAttribute('aria-checked', s); });
+          $('#nextQ').disabled = false;
+        });
+        $('#nextQ').onclick = async () => {
+          if (!last) { idx++; draft.idx = idx; LS.set(dk, draft); return paint(); }
+          const left = qs.length - Object.keys(draft.choices).length;
+          if (left > 0 && !(await confirmDialog(`Masih ada <b>${left}</b> soalan belum dijawab. Hantar juga?`, 'Hantar'))) return;
+          submit(false);
+        };
+        const pv = $('#prevQ'); if (pv) pv.onclick = () => { idx--; draft.idx = idx; LS.set(dk, draft); paint(); };
+        tick();
+      };
+      const tick = () => {
+        const left = closeAt - this.now(), el = $('#timeLeft');
+        if (el) { el.textContent = fmtDuration(left); $('#timerBar').classList.toggle('urgent', left < 30000); }
+        if (left <= 0) { clearInterval(this.qTimer); if (Object.keys(draft.choices).length) { toast('Masa tamat — jawapan dihantar automatik'); submit(true); } else { this.key = null; this.refresh(); } }
+      };
+      paint();
+      this.qTimer = every(1000, tick);
+    },
+    tunggu_cabutan(w, v) {
+      w.innerHTML = `<section class="card jscreen">${this.head(v)}
+        <div class="big-icon gold hourglass">${ICON.gift}</div>
+        <h1>Menunggu cabutan…</h1>
+        <div class="ticket-count" aria-label="${v.tickets ?? 0} tiket">${ICON.ticket}${v.tickets ?? 0}</div>
+        <p>${(v.tickets ?? 0) === 1 ? 'tiket' : 'tiket'} cabutan anda. Keputusan akan muncul di sini secara automatik.</p>
+        <div class="dots"><i></i><i></i><i></i></div>
+      </section>`;
+    },
+    async tahniah(w, v) {
+      w.innerHTML = `<section class="card jscreen accent">${this.head(v)}
+        <div class="big-icon gold">${ICON.gift}</div>
+        <h1>Tahniah, ${esc(v.name)}!</h1>
+        <p>Anda memenangi <b>${esc(v.win.prize)}</b>. Sila hubungi AJK masjid untuk tuntutan hadiah.</p>
+        <div class="poster-wrap" id="posterBox"></div>
+        <div class="btn-row center" style="margin-top:14px">
+          <button class="btn btn-primary" id="btnDl">${ICON.download} Muat Turun Poster</button>
+          ${Poster.canShareFiles() ? `<button class="btn btn-ghost" id="btnShare">${ICON.share} Kongsi</button>` : ''}
+        </div>
+      </section>${this.reviewHTML(v)}`;
+      confetti();
+      Poster.masjid = v.masjidName;
+      const c = await Poster.winner(v.session, v.name, v.win.prize);
+      const box = $('#posterBox'); if (!box) return;
+      c.id = 'winPoster'; box.appendChild(c);
+      const f = `tahniah-${slug(v.name)}.png`;
+      $('#btnDl').onclick = () => Poster.download(c, f);
+      const sh = $('#btnShare'); if (sh) sh.onclick = () => Poster.share(c, f, `Alhamdulillah, saya memenangi ${v.win.prize} di ${v.masjidName}!`);
+    },
+    belum(w, v) {
+      w.innerHTML = `<section class="card jscreen">${this.head(v)}
+        <div class="big-icon">${ICON.heart}</div>
+        <h1>Belum rezeki</h1>
+        <p>Jumpa sesi akan datang, insya-Allah. Terima kasih kerana hadir dan mendengar dengan teliti.</p>
+        <p class="small">Tiket anda sesi ini: <b>${v.tickets ?? 0}</b>${v.streak ? ` · <span class="streak">🔥 ${v.streak} berturut</span>` : ''}</p>
+      </section>${this.reviewHTML(v)}`;
+    },
+  },
+};
+
+Views.j = async (app, params) => {
+  J.app = app; J.key = null;
+  const alive = Router.alive();
+  if (params.s) {
+    J.flash = null; // imbasan/pautan baharu → buang mesej token lama
+    LS.set(K.current, params.s);
+    const clean = location.pathname + location.search + '#j';
+    if (params.t) {
+      const r = await API.checkin(params.s, params.t).catch(() => ({ ok: false, reason: 'invalid' }));
+      if (r.ok) { LS.set(K.checkin, { sid: params.s, ticket: r.ticket, at: Date.now() }); J.flash = null; }
+      else J.flash = r.reason === 'expired' ? 'expired' : 'invalid';
+    }
+    history.replaceState(null, '', clean);
+  }
+  if (!alive()) return;
+  Router.dataHandler = () => J.refresh();
+  every(20000, () => J.refresh()); // sandaran jika isyarat masa nyata terlepas
+  J.refresh();
+};
+
+/* =====================================================================
+   12. PANEL AJK (#admin)
+   ===================================================================== */
+const A = {
+  tab: 'langsung', sel: null, sub: 'butiran', snap: null, app: null,
+  TABS: [['langsung', 'Langsung'], ['sesi', 'Sesi & Soalan'], ['templat', 'Templat'], ['ranking', 'Ranking'], ['laporan', 'Laporan'], ['tetapan', 'Tetapan']],
+  async reload() { this.snap = await API.snapshot(); this.renderTab(); },
+  s(id) { return this.snap.sessions.find((x) => x.id === id); },
+  sorted() { return [...this.snap.sessions].sort((a, b) => sessionKey(b).localeCompare(sessionKey(a))); },
+  active() { return this.sorted().find((s) => ['registration', 'questions', 'closed', 'drawing'].includes(s.state)) || this.sorted().find((s) => s.state === 'draft') || this.sorted()[0]; },
+  body() { return $('#atabBody'); },
+  renderTab() { const b = this.body(); if (!b) return; b.innerHTML = ''; b.className = 'fade-up'; void b.offsetWidth; Tabs[this.tab](b); },
+};
+const pendingSaves = new Map();
+const flushSaves = debounce(async () => { const ops = [...pendingSaves.values()]; pendingSaves.clear(); if (ops.length) await API.write(ops); }, 400);
+/** Simpan separa (medan yang berubah sahaja) — digabung & ditangguh 400ms. */
+function saveSoon(t, row) { const k = t + row.id, prev = pendingSaves.get(k); pendingSaves.set(k, { t, op: 'upsert', row: { ...(prev?.row || {}), ...row } }); flushSaves(); }
+async function saveNow(t, row) { const r = await API.write([{ t, op: 'upsert', row }]); if (r && r.ok === false) toast(r.reason || 'Gagal menyimpan', 'error'); return r; }
+
+Views.admin = async (app, params) => {
+  if (!Auth.ok()) return renderPinGate(app, 'Panel AJK');
+  const alive = Router.alive();
+  A.app = app; A.tab = A.TABS.some(([k]) => k === params.tab) ? params.tab : (params.tab ? 'langsung' : A.tab);
+  A.snap = await API.snapshot().catch((e) => { toast('Gagal memuat data: ' + e.message, 'error'); return null; });
+  if (!alive() || !A.snap) return;
+  paintBrand(A.snap.settings.masjidName);
+  const isDef = await API.isDefaultPin().catch(() => false);
+  app.innerHTML = `
+    <section class="page-head head-row">
+      <div><div class="eyebrow">Panel AJK</div><h1>${esc(CONFIG.APP_NAME)}</h1></div>
+      <button class="btn btn-ghost btn-sm" id="btnLogout">${ICON.logout} Log keluar</button>
+    </section>
+    ${isDef ? `<div class="note warn" style="margin-bottom:14px">${ICON.alert}<span>Anda masih menggunakan PIN lalai <b>${CONFIG.DEFAULT_PIN}</b>. Sila tukar dalam tab <b>Tetapan</b>.</span></div>` : ''}
+    <nav class="atabs" aria-label="Menu AJK">${A.TABS.map(([k, l]) => `<a class="atab ${A.tab === k ? 'active' : ''}" href="#admin?tab=${k}" ${A.tab === k ? 'aria-current="page"' : ''}>${l}</a>`).join('')}</nav>
+    <div id="atabBody"></div>`;
+  $('#btnLogout').onclick = () => { Auth.logout(); Router.render(); };
+  A.renderTab();
+  // Masa nyata: kemas kini data; hanya tab Langsung dilukis semula (tab lain mungkin sedang disunting)
+  Router.dataHandler = async () => { const s = await API.snapshot().catch(() => null); if (!s || !alive()) return; A.snap = s; if (A.tab === 'langsung') A.renderTab(); };
+  every(2000, () => autoCloseQuestions(A.snap));
+};
+/** Tutup soalan automatik apabila pemasa tamat (jika panel AJK / skrin terbuka). */
+function autoCloseQuestions(snap) {
+  if (!snap) return;
+  snap.sessions.filter((s) => s.state === 'questions' && s.questionsCloseAt && Clock.now() > Date.parse(s.questionsCloseAt) + CONFIG.ANSWER_GRACE_MS)
+    .forEach((s) => { s.state = 'closed'; API.setState(s.id, 'closed').catch(() => {}); });
+}
+
+const Tabs = {};
+
+/* ----- Tab: Kawalan Langsung ----- */
+Tabs.langsung = (el) => {
+  const d = A.snap;
+  if (!A.s(A.sel)) A.sel = A.active()?.id;
+  const s = A.s(A.sel);
+  if (!s) {
+    el.innerHTML = `<section class="card empty"><div class="big-icon">${ICON.layers}</div><h2>Belum ada sesi</h2><p class="muted">Cipta templat (cth. Khutbah Jumaat) dan jana sesi dengan satu klik.</p><a class="btn btn-primary" href="#admin?tab=templat">${ICON.plus} Ke Templat</a></section>`;
+    return;
+  }
+  const regs = d.registrations.filter((r) => r.sessionId === s.id);
+  const answered = new Set(d.answers.filter((a) => a.sessionId === s.id).map((a) => a.participantId)).size;
+  const tickets = Logic.tickets(d, s.id).length;
+  const ws = Logic.winners(d, s.id);
+  const nq = Logic.approved(d, s.id).length;
+  const ci = STATES.indexOf(s.state);
+  const ctl = [
+    ['registration', 'Buka Pendaftaran', ICON.qr, 'btn-primary'],
+    ['questions', 'Buka Soalan', ICON.play, 'btn-gold'],
+    ['closed', 'Tutup Soalan', ICON.stop, 'btn-ghost'],
+    ['drawing', 'Mulakan Cabutan', ICON.gift, 'btn-gold'],
+  ];
+  el.innerHTML = `
+    <section class="card accent">
+      <div class="card-title">
+        <div style="flex:1;min-width:220px"><label class="sr-only" for="liveSel">Sesi</label>
+          <select id="liveSel" class="input">${A.sorted().map((x) => `<option value="${x.id}" ${x.id === s.id ? 'selected' : ''}>${esc(x.title)} — ${esc(fmtDateShort(x.date))} (${STATE_LABEL[x.state]})</option>`).join('')}</select></div>
+        <span class="badge ${['registration', 'questions', 'drawing'].includes(s.state) ? 'live' : s.state === 'done' ? 'ok' : 'draft'}">${STATE_LABEL[s.state]}</span>
+      </div>
+      <div class="stepper">${STATES.map((k, i) => `<div class="step ${i < ci ? 'done' : i === ci ? 'now' : ''}">${STATE_LABEL[k]}</div>`).join('')}</div>
+      <div class="ctl-grid">
+        ${ctl.map(([to, label, ic, cls]) => { const err = Logic.transitionError(d, s, to); return `<button class="btn ${cls} ctl" data-to="${to}" ${err ? 'disabled' : ''} title="${esc(err)}">${ic}<span>${label}</span>${err && STATES.indexOf(to) === ci + 1 ? `<small>${esc(err)}</small>` : ''}</button>`; }).join('')}
+      </div>
+      ${['closed', 'drawing'].includes(s.state) ? `<div class="btn-row" style="margin-top:12px"><button class="btn btn-ghost" data-to="done">${ICON.check} Tamatkan Sesi</button></div>` : ''}
+      <div class="live-stats">
+        <div class="stat"><b id="lvHadir">${regs.length}</b><span>Jemaah hadir</span></div>
+        <div class="stat"><b id="lvJawab">${answered}/${regs.length}</b><span>Telah menjawab</span></div>
+        <div class="stat"><b>${tickets}</b><span>Jumlah tiket</span></div>
+        <div class="stat"><b>${ws.length}/${(s.prizes || []).length}</b><span>Pemenang / hadiah</span></div>
+        ${s.state === 'questions' ? `<div class="stat"><b id="lvTimer">--:--</b><span>Masa menjawab berbaki</span></div>` : ''}
+      </div>
+      <div class="btn-row" style="margin-top:16px">
+        <a class="btn btn-primary" href="#skrin?s=${s.id}" target="_blank" rel="noopener">${ICON.expand} Buka Skrin Besar</a>
+        <a class="btn btn-ghost" href="#admin?tab=sesi" id="goEdit">${ICON.edit} Sunting sesi</a>
+        ${MODE === 'demo' && ['registration', 'questions'].includes(s.state) ? `<button class="btn btn-ghost" id="btnTestLink">${ICON.qr} Salin pautan QR aktif (uji)</button>` : ''}
+      </div>
+      ${nq < CONFIG.MIN_Q && s.state === 'draft' ? `<div class="note warn" style="margin-top:14px">${ICON.alert}<span>Sesi ini perlukan ${CONFIG.MIN_Q}–${CONFIG.MAX_Q} soalan diluluskan sebelum dibuka. Pergi ke <b>Sesi & Soalan</b>.</span></div>` : ''}
+    </section>
+    ${['closed', 'drawing', 'done'].includes(s.state) ? resultsCardHTML(d, s) : ''}`;
+  $('#liveSel').onchange = (e) => { A.sel = e.target.value; A.renderTab(); };
+  $('#goEdit').onclick = () => { A.sub = 'butiran'; };
+  $$('[data-to]', el).forEach((b) => b.onclick = async () => {
+    const to = b.dataset.to;
+    if (to === 'done' && ws.length < (s.prizes || []).length && Logic.pool(d, s.id).length && !(await confirmDialog('Masih ada hadiah belum dicabut. Tamatkan sesi juga?', 'Tamatkan'))) return;
+    if (to === 'questions' && !(await confirmDialog(`Buka soalan sekarang? Jemaah ada <b>${s.answerMinutes} minit</b> untuk menjawab.`, 'Buka Soalan'))) return;
+    b.disabled = true;
+    const r = await API.setState(s.id, to).catch((e) => ({ ok: false, reason: e.message }));
+    if (!r.ok) toast(r.reason, 'error'); else toast(`Keadaan: ${STATE_LABEL[to]}`, 'success');
+    await A.reload();
+  });
+  const tl = $('#btnTestLink');
+  if (tl) tl.onclick = async () => { const url = `${location.origin}${location.pathname}#j?s=${s.id}&t=${await API.token(s.id)}`; try { await navigator.clipboard.writeText(url); toast('Pautan aktif disalin (sah ±60 saat)', 'success'); } catch { prompt('Pautan', url); } };
+  clearInterval(A.liveTimer);
+  if (s.state === 'questions') { const tk = () => { const t = $('#lvTimer'); if (t) t.textContent = fmtDuration(Date.parse(s.questionsCloseAt) - Clock.now()); }; tk(); A.liveTimer = every(1000, tk); }
+  bindResults(el, d, s);
+};
+
+function waWinnerMsg(masjid, s, name, prize) {
+  return `Assalamualaikum ${name},\n\nTahniah! 🎉 Anda terpilih sebagai *pemenang cabutan ${CONFIG.APP_NAME}* di ${masjid}.\n\n🎁 Hadiah: *${prize}*\n📖 Sesi: ${s.title}\n📅 ${fmtDate(s.date)}\n\nSila hubungi AJK masjid untuk tuntutan hadiah. Semoga terus istiqamah hadir ke majlis ilmu. 🤲`;
+}
+function resultText(d, s) {
+  const qs = Logic.approved(d, s.id), pts = (s.summary || []).filter(Boolean), ws = Logic.winners(d, s.id);
+  const name = (id) => d.participants.find((p) => p.id === id)?.name || '-';
+  return [`📚 *Ringkasan Ilmu & Keputusan — ${s.title}*`, `${s.speaker ? s.speaker + ' · ' : ''}${fmtDate(s.date)}`, '',
+    ...(pts.length ? ['*Poin utama:*', ...pts.map((p) => '• ' + p), ''] : []),
+    ...(qs.length ? ['*Jawapan betul:*', ...qs.map((q, i) => `${i + 1}. ${answerLine(q.text, q.options[q.correctIndex], false)}`), ''] : []),
+    ...(ws.length ? ['*Pemenang cabutan:*', ...ws.map((w) => `🎁 ${w.prize} — ${name(w.participantId)}`), ''] : []),
+    `Kehadiran: ${d.registrations.filter((r) => r.sessionId === s.id).length} jemaah`, `${d.settings.masjidName} · ${CONFIG.APP_NAME} (penyertaan PERCUMA)`].join('\n');
+}
+function resultsCardHTML(d, s) {
+  const ws = Logic.winners(d, s.id);
+  return `<section class="card" style="margin-top:14px">
+    <div class="card-title"><h3>Keputusan & Ringkasan Ilmu</h3>
+      <a class="btn btn-wa btn-sm" id="waResult" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(resultText(d, s))}">${ICON.whatsapp} Hantar Ringkasan & Keputusan</a></div>
+    ${ws.length ? ws.map((w) => { const p = d.participants.find((x) => x.id === w.participantId) || { name: '-', phone: '' }; return `<div class="winner-row"><span class="rank">${w.order}</span>
+      <div class="info"><b>${esc(p.name)}</b><span class="small muted">${esc(w.prize)} · ${esc(formatPhone(p.phone))}</span></div>
+      <button class="btn btn-ghost btn-sm" data-poster="${w.id}">Poster</button>
+      <a class="btn btn-wa btn-sm" target="_blank" rel="noopener" href="https://wa.me/${waNumber(p.phone)}?text=${encodeURIComponent(waWinnerMsg(d.settings.masjidName, s, p.name, w.prize))}">${ICON.whatsapp} WhatsApp</a></div>`; }).join('') : '<p class="muted">Belum ada pemenang.</p>'}
+  </section>`;
+}
+function bindResults(el, d, s) {
+  $$('[data-poster]', el).forEach((b) => b.onclick = async () => {
+    const w = d.winners.find((x) => x.id === b.dataset.poster), p = d.participants.find((x) => x.id === w.participantId);
+    Poster.masjid = d.settings.masjidName;
+    const c = await Poster.winner(s, p.name, w.prize); c.id = 'adminPoster'; c.style.width = '100%'; c.style.borderRadius = '12px';
+    const v = await openModal({ title: `Poster — ${p.name}`, html: '<div id="mp"></div>', onOpen: (m) => $('#mp', m).appendChild(c), actions: [{ label: 'Tutup', value: null }, { label: `${ICON.download} Muat Turun`, cls: 'btn-primary', value: 'dl' }] });
+    if (v === 'dl') Poster.download(c, `tahniah-${slug(p.name)}.png`);
+  });
+}
+
+/* ----- Tab: Templat ----- */
+Tabs.templat = (el) => {
+  const tpls = [...A.snap.templates].sort((a, b) => a.name.localeCompare(b.name));
+  el.innerHTML = `<section class="card">
+    <div class="card-title"><h2>Templat Sesi Berulang</h2><button class="btn btn-primary" id="btnNewTpl">${ICON.plus} Templat Baharu</button></div>
+    <p class="muted">Contoh: "Khutbah Jumaat" setiap Jumaat 1:30–2:30 ptg dengan senarai hadiah lalai. Streak kehadiran dikira bagi sesi dalam templat yang sama.</p>
+    <div id="tplList">${tpls.length ? tpls.map((t) => `<div class="tpl-item" data-tid="${t.id}"><b>${esc(t.name)}</b>
+      <div class="meta"><span>${t.weekday != null && t.weekday !== '' ? WEEKDAYS[t.weekday] : 'Bila-bila'} · ${fmtTime12(t.startTime)}–${fmtTime12(t.endTime)}</span><span>${t.answerMinutes} min menjawab</span><span>${(t.prizes || []).length} hadiah</span><span>${A.snap.sessions.filter((s) => s.templateId === t.id).length} sesi</span></div>
+      <div class="btn-row"><button class="btn btn-primary btn-sm" data-tact="use">${ICON.bolt} Cipta Sesi (1 Klik)</button><button class="btn btn-ghost btn-sm" data-tact="edit" aria-label="Edit templat">${ICON.edit}</button><button class="btn btn-danger btn-sm" data-tact="del" aria-label="Padam templat">${ICON.trash}</button></div></div>`).join('')
+      : '<p class="muted">Belum ada templat.</p>'}</div>
+  </section>`;
+  $('#btnNewTpl').onclick = () => editTemplate(null);
+  $('#tplList').onclick = async (e) => {
+    const b = e.target.closest('[data-tact]'); if (!b) return;
+    const t = A.snap.templates.find((x) => x.id === b.closest('[data-tid]').dataset.tid);
+    if (b.dataset.tact === 'use') {
+      const s = { id: uid('s_'), templateId: t.id, title: t.title, speaker: t.speaker, date: nextTemplateDate(t, A.snap.sessions), startTime: t.startTime, endTime: t.endTime, answerMinutes: t.answerMinutes, prizes: [...(t.prizes || [])], transcript: '', summary: [], state: 'draft', stateAt: nowISO(), questionsOpenedAt: null, questionsCloseAt: null, rev: 0, createdAt: nowISO() };
+      await saveNow('sessions', s);
+      toast(`Sesi "${s.title}" (${fmtDateShort(s.date)}) dicipta — tampal teks khutbah`, 'success');
+      A.sel = s.id; A.sub = 'soalan'; location.hash = 'admin?tab=sesi';
+    } else if (b.dataset.tact === 'edit') editTemplate(t);
+    else if (await confirmDialog(`Padam templat <b>${esc(t.name)}</b>? Sesi sedia ada tidak terjejas.`, 'Padam', true)) { await API.write([{ t: 'templates', op: 'delete', id: t.id }]); A.reload(); }
+  };
+};
+function editTemplate(t, preset) {
+  const d = t || { name: '', title: '', speaker: '', weekday: 5, startTime: '13:30', endTime: '14:30', answerMinutes: 5, prizes: [], ...(preset || {}) };
+  openModal({
+    title: t ? 'Edit Templat' : 'Templat Sesi Baharu',
+    html: `<form id="tplForm" onsubmit="return false" novalidate>
+      <div class="field"><label for="tName">Nama templat</label><input id="tName" maxlength="60" placeholder="cth. Khutbah Jumaat" value="${esc(d.name)}"></div>
+      <div class="field"><label for="tTitle">Tajuk sesi lalai</label><input id="tTitle" maxlength="120" value="${esc(d.title)}"></div>
+      <div class="field"><label for="tSpeaker">Penceramah / Khatib</label><input id="tSpeaker" maxlength="80" value="${esc(d.speaker)}"></div>
+      <div class="row">
+        <div class="field"><label for="tDay">Hari</label><select id="tDay"><option value="">Bila-bila</option>${WEEKDAYS.map((w, i) => `<option value="${i}" ${String(d.weekday) === String(i) ? 'selected' : ''}>${w}</option>`).join('')}</select></div>
+        <div class="field"><label for="tStart">Mula</label><input id="tStart" type="time" value="${esc(d.startTime)}"></div>
+        <div class="field"><label for="tEnd">Tamat</label><input id="tEnd" type="time" value="${esc(d.endTime)}"></div>
+      </div>
+      <div class="field"><label for="tMin">Masa menjawab (minit)</label><input id="tMin" type="number" min="1" max="60" value="${d.answerMinutes}"></div>
+      <div class="field"><label for="tPrizes">Hadiah lalai (satu baris satu hadiah)</label><textarea id="tPrizes" rows="4">${esc((d.prizes || []).join('\n'))}</textarea></div>
+    </form>`,
+    actions: [{ label: 'Batal', value: null }, { label: `${ICON.check} Simpan Templat`, cls: 'btn-primary', value: 'save' }],
+    onAction: (v, m) => {
+      if (v !== 'save') return true;
+      const day = $('#tDay', m).value;
+      const f = { name: $('#tName', m).value.trim(), title: $('#tTitle', m).value.trim(), speaker: $('#tSpeaker', m).value.trim(), weekday: day === '' ? null : +day, startTime: $('#tStart', m).value, endTime: $('#tEnd', m).value, answerMinutes: Math.min(60, Math.max(1, Math.floor(+$('#tMin', m).value || 5))), prizes: $('#tPrizes', m).value.split('\n').map((x) => x.trim()).filter(Boolean) };
+      if (!f.name || !f.title) { toast('Sila isi nama templat dan tajuk sesi', 'error'); return false; }
+      if (!f.startTime || !f.endTime || f.endTime <= f.startTime) { toast('Masa tamat mesti selepas masa mula', 'error'); return false; }
+      saveNow('templates', { ...(t || { id: uid('t_'), createdAt: nowISO() }), ...f }).then(() => { toast('Templat disimpan', 'success'); A.reload(); });
+      return true;
+    },
+  });
+}
+
+/* ----- Tab: Sesi & Soalan ----- */
+Tabs.sesi = (el) => {
+  const list = A.sorted();
+  if (A.sel !== 'new' && !A.s(A.sel)) A.sel = A.active()?.id || 'new';
+  const s = A.sel === 'new' ? null : A.s(A.sel);
+  el.innerHTML = `<div class="admin-layout">
+    <aside class="card"><div class="card-title"><h3>Sesi</h3><button class="btn btn-ghost btn-sm" id="btnNewS">${ICON.plus} Sesi kosong</button></div>
+      <div class="s-list">${list.length ? list.map((x) => `<button class="s-item ${x.id === A.sel ? 'active' : ''}" data-sid="${x.id}"><b>${esc(x.title)}</b><div class="meta"><span>${esc(fmtDateShort(x.date))}</span><span class="badge ${x.state === 'done' ? 'ok' : x.state === 'draft' ? 'draft' : 'live'}">${STATE_LABEL[x.state]}</span></div></button>`).join('') : '<p class="muted small">Belum ada sesi. Guna templat untuk cipta dengan 1 klik.</p>'}</div></aside>
+    <div id="sEditor"></div></div>`;
+  $('#btnNewS').onclick = () => { A.sel = 'new'; A.sub = 'butiran'; A.renderTab(); };
+  $$('.s-item', el).forEach((b) => b.onclick = () => { A.sel = b.dataset.sid; A.renderTab(); });
+  const ed = $('#sEditor');
+  if (!s) return sessionForm(ed, null);
+  const qn = A.snap.questions.filter((q) => q.sessionId === s.id).length, rn = A.snap.registrations.filter((r) => r.sessionId === s.id).length;
+  ed.innerHTML = `<div class="tabs" role="tablist">${[['butiran', 'Butiran'], ['soalan', `Soalan <span class="count">${qn}/${CONFIG.MAX_Q}</span>`], ['peserta', `Peserta <span class="count">${rn}</span>`]].map(([k, l]) => `<button class="tab ${A.sub === k ? 'active' : ''}" data-sub="${k}" role="tab" aria-selected="${A.sub === k}">${l}</button>`).join('')}</div><div id="subBody"></div>`;
+  $$('[data-sub]', ed).forEach((b) => b.onclick = () => { A.sub = b.dataset.sub; A.renderTab(); });
+  ({ butiran: sessionForm, soalan: questionsTab, peserta: participantsTab })[A.sub]($('#subBody'), s);
+};
+function sessionForm(el, s) {
+  const d = s || { title: '', speaker: '', date: today(), startTime: '13:30', endTime: '14:30', answerMinutes: 5, templateId: null, prizes: [] };
+  el.innerHTML = `<section class="card">
+    <div class="card-title"><h2>${s ? 'Butiran Sesi' : 'Sesi Baharu'}</h2>${s ? `<span class="badge">${STATE_LABEL[s.state]}</span>` : ''}</div>
+    <form id="sForm" novalidate>
+      <div class="field"><label for="fTitle">Tajuk khutbah / ceramah</label><input id="fTitle" maxlength="120" value="${esc(d.title)}"></div>
+      <div class="field"><label for="fSpeaker">Penceramah / Khatib</label><input id="fSpeaker" maxlength="80" value="${esc(d.speaker)}"></div>
+      <div class="row">
+        <div class="field" style="flex-basis:220px"><label for="fDate">Tarikh</label><input id="fDate" type="date" value="${esc(d.date)}"></div>
+        <div class="field"><label for="fStart">Mula</label><input id="fStart" type="time" value="${esc(d.startTime)}"></div>
+        <div class="field"><label for="fEnd">Tamat</label><input id="fEnd" type="time" value="${esc(d.endTime)}"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label for="fMin">Masa menjawab (minit)</label><input id="fMin" type="number" min="1" max="60" value="${d.answerMinutes}"></div>
+        <div class="field" style="flex-basis:220px"><label for="fTpl">Templat (untuk streak)</label><select id="fTpl"><option value="">— Tiada —</option>${A.snap.templates.map((t) => `<option value="${t.id}" ${d.templateId === t.id ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select></div>
+      </div>
+      <div class="field"><label for="fPrizes">Senarai hadiah (satu baris = satu pemenang)</label><textarea id="fPrizes" rows="4">${esc((d.prizes || []).join('\n'))}</textarea></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" type="submit">${ICON.check} ${s ? 'Simpan' : 'Cipta Sesi'}</button>
+        ${s ? `<button class="btn btn-ghost" type="button" id="btnAsTpl">${ICON.layers} Simpan sbg Templat</button><button class="btn btn-danger" type="button" id="btnDelS">${ICON.trash} Padam</button>` : ''}
+      </div>
+    </form></section>`;
+  $('#sForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const f = { title: $('#fTitle').value.trim(), speaker: $('#fSpeaker').value.trim(), date: $('#fDate').value, startTime: $('#fStart').value, endTime: $('#fEnd').value, answerMinutes: Math.min(60, Math.max(1, Math.floor(+$('#fMin').value || 5))), templateId: $('#fTpl').value || null, prizes: $('#fPrizes').value.split('\n').map((x) => x.trim()).filter(Boolean) };
+    if (!f.title) return toast('Sila isi tajuk', 'error');
+    if (!f.date || !f.startTime || !f.endTime) return toast('Sila isi tarikh dan masa', 'error');
+    if (f.endTime <= f.startTime) return toast('Masa tamat mesti selepas masa mula', 'error');
+    if (s && f.prizes.length < Logic.winners(A.snap, s.id).length) return toast('Senarai hadiah tidak boleh kurang daripada pemenang sedia ada', 'error');
+    const row = s ? { id: s.id, ...f } : { id: uid('s_'), transcript: '', summary: [], state: 'draft', stateAt: nowISO(), questionsOpenedAt: null, questionsCloseAt: null, rev: 0, createdAt: nowISO(), ...f };
+    await saveNow('sessions', row);
+    toast(s ? 'Sesi disimpan' : 'Sesi dicipta', 'success');
+    if (!s) { A.sel = row.id; A.sub = 'soalan'; }
+    A.reload();
+  };
+  if (!s) return;
+  $('#btnAsTpl').onclick = () => editTemplate(null, { name: s.title, title: s.title, speaker: s.speaker, weekday: new Date(s.date + 'T00:00').getDay(), startTime: s.startTime, endTime: s.endTime, answerMinutes: s.answerMinutes, prizes: s.prizes || [] });
+  $('#btnDelS').onclick = async () => {
+    if (!(await confirmDialog(`Padam sesi <b>${esc(s.title)}</b> beserta soalan, kehadiran, jawapan dan pemenang?`, 'Padam', true))) return;
+    await API.write([{ t: 'sessions', op: 'delete', id: s.id }]); A.sel = null; toast('Sesi dipadam'); A.reload();
+  };
+}
+function questionsTab(el, s) {
+  const qs = A.snap.questions.filter((q) => q.sessionId === s.id);
+  const ok = qs.filter((q) => q.status === 'lulus').length;
+  const locked = !['draft', 'registration'].includes(s.state);
+  el.innerHTML = `
+    ${locked ? `<div class="note warn" style="margin-bottom:14px">${ICON.lock}<span>Soalan dikunci kerana sesi sudah di peringkat "${STATE_LABEL[s.state]}".</span></div>` : `
+    <section class="card oneclick">
+      <div class="card-title"><h3>⚡ Mod 1 Klik</h3><span class="badge ${CONFIG.AI_ENDPOINT ? 'ok' : ''}">${CONFIG.AI_ENDPOINT ? 'API AI' : 'Mod asas'}</span></div>
+      <p class="muted small">Tampal teks khutbah → klik → ${CONFIG.MIN_Q}–${CONFIG.MAX_Q} soalan objektif dijana & diluluskan, ringkasan ilmu disediakan. Semak & sunting di bawah.</p>
+      <div class="field"><label for="transcript">Teks khutbah / transkrip</label><textarea id="transcript" rows="7" placeholder="Tampal teks khutbah di sini…">${esc(s.transcript)}</textarea><span class="hint" id="wc"></span></div>
+      <div class="row">
+        <div class="field" style="flex:0 0 150px"><label for="qN">Bil. soalan</label><select id="qN">${[3, 4, 5].map((n) => `<option ${n === 5 ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+        <div class="field" style="flex:1 1 220px"><button class="btn btn-gold btn-lg btn-block" id="btn1Click" type="button">${ICON.bolt} Jana & Lulus (1 Klik)</button></div>
+      </div>
+    </section>`}
+    <section class="card">
+      <div class="card-title"><h3>Ringkasan Ilmu</h3>${locked ? '' : `<button class="btn btn-ghost btn-sm" id="btnSum">${ICON.sparkle} Jana Ringkasan</button>`}</div>
+      <div class="field"><label for="summary">Poin utama (satu baris satu poin) — dipapar kepada jemaah selepas sesi tamat</label><textarea id="summary" rows="4">${esc((s.summary || []).join('\n'))}</textarea></div>
+    </section>
+    <section class="card">
+      <div class="card-title"><h3>Soalan <span class="muted small">(${ok} lulus / ${qs.length} · ${CONFIG.MIN_Q}–${CONFIG.MAX_Q})</span></h3>
+        ${locked ? '' : `<div class="btn-row">${qs.some((q) => q.status !== 'lulus') ? `<button class="btn btn-ghost btn-sm" id="btnAll">${ICON.check} Lulus Semua</button>` : ''}<button class="btn btn-primary btn-sm" id="btnAddQ" ${qs.length >= CONFIG.MAX_Q ? 'disabled' : ''}>${ICON.plus} Manual</button></div>`}</div>
+      <div id="qList">${qs.length ? qs.map((q, i) => qCardHTML(q, i, locked)).join('') : '<p class="muted center" style="padding:16px 0">Belum ada soalan. Guna Mod 1 Klik di atas.</p>'}</div>
+    </section>`;
+  $('#summary').oninput = (e) => { saveSoon('sessions', { id: s.id, summary: e.target.value.split('\n').map((l) => l.trim()).filter(Boolean) }); };
+  if (locked) return;
+  const ta = $('#transcript');
+  const words = () => (ta.value.trim().match(/\S+/g) || []).length;
+  const wc = () => { $('#wc').textContent = `${words()} patah perkataan`; }; wc();
+  ta.oninput = () => { wc(); saveSoon('sessions', { id: s.id, transcript: ta.value }); };
+  const needText = () => { if (words() < 30) { toast('Teks terlalu pendek — tampal sekurang-kurangnya 30 patah perkataan', 'error'); ta.focus(); return true; } return false; };
+  $('#btn1Click').onclick = async () => {
+    if (needText()) return;
+    if (qs.length && !(await confirmDialog(`Ganti ${qs.length} soalan sedia ada?`, 'Ganti'))) return;
+    const btn = $('#btn1Click'); btn.disabled = true; btn.textContent = 'Sedang menjana…';
+    const text = ta.value.trim();
+    const [{ questions, source }, { points }] = await Promise.all([generateQuestions(text, +$('#qN').value), generateSummary(text, 4)]);
+    const ops = qs.map((q) => ({ t: 'questions', op: 'delete', id: q.id }));
+    let approved = 0;
+    questions.slice(0, CONFIG.MAX_Q).forEach((q) => { const good = !validateQ(q); if (good) approved++; ops.push({ t: 'questions', op: 'upsert', row: { id: uid('q_'), sessionId: s.id, ...q, source, status: good ? 'lulus' : 'draf', createdAt: nowISO() } }); });
+    ops.push({ t: 'sessions', op: 'upsert', row: { id: s.id, transcript: text, summary: points } });
+    pendingSaves.clear();
+    await API.write(ops);
+    toast(`${approved} soalan dijana & diluluskan, ringkasan disediakan. Sila semak.`, approved >= CONFIG.MIN_Q ? 'success' : 'error');
+    A.reload();
+  };
+  $('#btnSum').onclick = async () => { if (needText()) return; const { points } = await generateSummary(ta.value.trim(), 4); $('#summary').value = points.join('\n'); await saveNow('sessions', { id: s.id, summary: points }); toast('Ringkasan dijana — sila semak', 'success'); };
+  $('#btnAddQ').onclick = async () => { if (qs.length >= CONFIG.MAX_Q) return toast(`Maksimum ${CONFIG.MAX_Q} soalan`, 'error'); await saveNow('questions', { id: uid('q_'), sessionId: s.id, text: '', options: ['', '', '', ''], correctIndex: 0, status: 'draf', source: 'manual', createdAt: nowISO() }); A.reload(); };
+  const all = $('#btnAll');
+  if (all) all.onclick = async () => {
+    const bad = qs.filter((q) => validateQ(q));
+    await API.write(qs.filter((q) => !validateQ(q)).map((q) => ({ t: 'questions', op: 'upsert', row: { ...q, status: 'lulus' } })));
+    toast(bad.length ? `${bad.length} soalan tidak lengkap tidak diluluskan` : 'Semua soalan diluluskan', bad.length ? 'error' : 'success'); A.reload();
+  };
+  const listEl = $('#qList');
+  const qOf = (e) => A.snap.questions.find((q) => q.id === e.target.closest('[data-qid]')?.dataset.qid);
+  listEl.oninput = (e) => { const q = qOf(e); if (!q) return; const f = e.target.dataset.f; if (f === 'text') q.text = e.target.value; else if (f === 'opt') q.options[+e.target.dataset.i] = e.target.value; else return; saveSoon('questions', q); };
+  listEl.onchange = (e) => { if (e.target.dataset.f !== 'correct') return; const q = qOf(e); q.correctIndex = +e.target.value; saveSoon('questions', q); };
+  listEl.onclick = async (e) => {
+    const b = e.target.closest('[data-act]'); if (!b) return; const q = qOf(e); if (!q) return;
+    await flushNow();
+    if (b.dataset.act === 'approve') { const err = validateQ(q); if (err) return toast(err, 'error'); await saveNow('questions', { ...q, status: 'lulus' }); toast('Soalan diluluskan', 'success'); }
+    else if (b.dataset.act === 'unapprove') await saveNow('questions', { ...q, status: 'draf' });
+    else if (b.dataset.act === 'delete') { if (!(await confirmDialog('Padam soalan ini?', 'Padam', true))) return; await API.write([{ t: 'questions', op: 'delete', id: q.id }]); }
+    A.reload();
+  };
+}
+async function flushNow() { const ops = [...pendingSaves.values()]; pendingSaves.clear(); if (ops.length) await API.write(ops); }
+function qCardHTML(q, i, locked) {
+  const ok = q.status === 'lulus', dis = locked ? 'disabled' : '';
+  return `<div class="q-card ${ok ? 'is-ok' : 'is-draft'}" data-qid="${q.id}">
+    <div class="q-card-head"><span class="q-num">${i + 1}</span><span class="badge ${ok ? 'ok' : 'draft'}">${ok ? 'Lulus' : 'Draf'}</span><span class="badge">${{ ai: 'AI', auto: 'Auto', manual: 'Manual' }[q.source] || ''}</span><span class="spacer"></span>
+      ${locked ? '' : `${ok ? `<button class="btn btn-ghost btn-sm" data-act="unapprove">Tarik balik</button>` : `<button class="btn btn-primary btn-sm" data-act="approve">${ICON.check} Lulus</button>`}<button class="btn btn-danger btn-sm" data-act="delete" aria-label="Padam soalan">${ICON.trash}</button>`}</div>
+    <label class="sr-only" for="qt_${q.id}">Teks soalan ${i + 1}</label>
+    <textarea class="input" id="qt_${q.id}" data-f="text" rows="2" ${dis}>${esc(q.text)}</textarea>
+    ${q.options.map((o, j) => `<div class="opt-edit"><input type="radio" name="c_${q.id}" value="${j}" data-f="correct" ${q.correctIndex === j ? 'checked' : ''} ${dis} aria-label="Pilihan ${'ABCD'[j]} jawapan betul"><span class="k">${'ABCD'[j]}</span><input class="input" data-f="opt" data-i="${j}" value="${esc(o)}" ${dis} aria-label="Pilihan ${'ABCD'[j]}"></div>`).join('')}
+    <p class="hint" style="margin:8px 0 0">Bulatan = jawapan betul. Susunan pilihan dirawak untuk setiap jemaah.</p></div>`;
+}
+function participantsTab(el, s) {
+  const d = A.snap, chain = s.templateId ? Logic.chain(d, s.templateId) : null, qn = Logic.approved(d, s.id).length;
+  const rows = d.registrations.filter((r) => r.sessionId === s.id).sort((a, b) => a.regNo - b.regNo).map((r) => {
+    const p = d.participants.find((x) => x.id === r.participantId); if (!p) return null;
+    const ans = d.answers.filter((a) => a.sessionId === s.id && a.participantId === p.id);
+    return { r, p, done: ans.length > 0, correct: ans.filter((a) => a.isCorrect).length, streak: Logic.streakAt(d, p.id, s.id, { chain }), bonus: Logic.bonusFor(d, p.id, s.id, { chain }) };
+  }).filter(Boolean);
+  el.innerHTML = `<section class="card"><h3>Hadir (${rows.length})</h3>${rows.length ? `<div class="table-wrap"><table>
+    <thead><tr><th>No.</th><th>Nama</th><th>Telefon</th><th>Status</th><th class="num">Streak</th><th class="num">Betul / Bonus</th></tr></thead>
+    <tbody>${rows.map((x) => `<tr><td>#${String(x.r.regNo).padStart(4, '0')}</td><td><b>${esc(x.p.name)}</b></td><td>${esc(formatPhone(x.p.phone))}</td><td>${x.done ? '<span class="badge ok">Sudah jawab</span>' : '<span class="badge">Belum</span>'}</td><td class="num">${x.streak ? '🔥 ' + x.streak : '-'}</td><td class="num">${x.correct}/${qn}${x.bonus ? ` <span class="streak">+${x.bonus}</span>` : ''}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">Belum ada jemaah hadir.</p>'}</section>`;
+}
+
+/* ----- Tab: Ranking (AJK sahaja; telefon disembunyikan) ----- */
+function badgesHTML(r, th) {
+  return [r.streak.current >= 2 ? `<span class="streak">🔥 ${r.streak.current} berturut</span>` : '', th > 0 && r.streak.best >= th ? '<span class="medal-badge">🏅 Istiqamah</span>' : '', r.wins ? `<span class="medal-badge">🎁 ${r.wins}x menang</span>` : ''].join('');
+}
+Tabs.ranking = (el) => {
+  const d = A.snap, rows = Logic.ranking(d), th = d.settings.streak.threshold, medals = ['🥇', '🥈', '🥉'];
+  el.innerHTML = `
+    <section class="head-row" style="margin-bottom:14px"><div><h2 style="margin:0">Jemaah Paling Istiqamah</h2><p class="muted small" style="margin:4px 0 0">Ikut jumlah sesi dihadiri, kemudian streak. Top 3 layak hadiah istimewa.</p></div>
+      <button class="btn btn-primary" id="btnCsv">${ICON.download} Eksport CSV</button></section>
+    ${rows.length ? `<div class="podium">${rows.slice(0, 3).map((r, i) => `<div class="pod p${i + 1}"><div class="medal">${i + 1}</div><div class="name">${esc(r.p.name)}</div><div class="score"><b>${r.sessionCount}</b> sesi · ${r.correct} betul</div><div class="badges">${badgesHTML(r, th)}</div></div>`).join('')}</div>` : ''}
+    <section class="card"><div class="card-title"><h3>Senarai Penuh</h3><div style="flex:1;max-width:300px;min-width:180px"><label for="rSearch" class="sr-only">Cari nama</label><input class="input" id="rSearch" placeholder="Cari nama…"></div></div>
+      ${rows.length ? `<div class="table-wrap"><table><thead><tr><th>#</th><th>Nama</th><th>Telefon</th><th class="num">Sesi</th><th class="num">Streak</th><th class="num">Betul</th><th class="num">Menang</th></tr></thead>
+      <tbody id="rBody">${rows.map((r, i) => `<tr data-name="${esc(r.p.name.toLowerCase())}"><td>${i < 3 ? medals[i] : i + 1}</td><td class="wrap"><b>${esc(r.p.name)}</b><div class="badges">${badgesHTML(r, th)}</div></td><td class="muted">${esc(maskPhone(r.p.phone))}</td><td class="num"><b>${r.sessionCount}</b></td><td class="num">${r.streak.current ? '🔥 ' + r.streak.current : '-'}</td><td class="num">${r.correct}</td><td class="num">${r.wins || '-'}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">Belum ada peserta.</p>'}
+    </section>`;
+  const sr = $('#rSearch'); sr.oninput = () => { const q = sr.value.trim().toLowerCase(); $$('#rBody tr').forEach((tr) => { tr.style.display = tr.dataset.name.includes(q) ? '' : 'none'; }); };
+  $('#btnCsv').onclick = () => { csvDownload(['Kedudukan', 'Nama', 'Telefon', 'Sesi Dihadiri', 'Streak Semasa', 'Streak Terbaik', 'Jawapan Betul', 'Jumlah Dijawab', 'Kali Menang', 'ID Peserta'], rows.map((r, i) => [i + 1, r.p.name, r.p.phone, r.sessionCount, r.streak.current, r.streak.best, r.correct, r.answered, r.wins, r.p.id]), `ranking-jemaah-${today()}.csv`); toast('CSV dimuat turun', 'success'); };
+};
+
+/* ----- Tab: Laporan ----- */
+function buildReport(d) {
+  const sessions = d.sessions.filter((s) => s.state !== 'draft').sort((a, b) => sessionKey(a).localeCompare(sessionKey(b)));
+  const byId = new Map(sessions.map((s) => [s.id, s])), first = new Map();
+  d.registrations.forEach((r) => { const s = byId.get(r.sessionId); if (!s) return; const k = sessionKey(s) + '|' + s.id; if (!first.has(r.participantId) || k < first.get(r.participantId)) first.set(r.participantId, k); });
+  const rows = sessions.map((s) => {
+    const regs = d.registrations.filter((r) => r.sessionId === s.id), ans = d.answers.filter((a) => a.sessionId === s.id), c = ans.filter((a) => a.isCorrect).length;
+    const baru = regs.filter((r) => (first.get(r.participantId) || '').endsWith('|' + s.id)).length;
+    return { s, hadir: regs.length, baru, tetap: regs.length - baru, menjawab: new Set(ans.map((a) => a.participantId)).size, jawapan: ans.length, betul: c, kadar: pct(c, ans.length), tiket: Logic.tickets(d, s.id).length, pemenang: Logic.winners(d, s.id).length,
+      questions: Logic.approved(d, s.id).map((q) => { const qa = ans.filter((a) => a.questionId === q.id), k = qa.filter((a) => a.isCorrect).length; return { q, dijawab: qa.length, betul: k, kadar: pct(k, qa.length) }; }) };
+  });
+  const months = new Map(); rows.forEach((r) => { const k = r.s.date.slice(0, 7), m = months.get(k) || { baru: 0, tetap: 0, sesi: 0 }; m.baru += r.baru; m.tetap += r.tetap; m.sesi++; months.set(k, m); });
+  const per = new Map(); d.registrations.forEach((r) => per.set(r.participantId, (per.get(r.participantId) || 0) + 1));
+  const ta = d.answers.length, tc = d.answers.filter((a) => a.isCorrect).length;
+  return { rows, months, monthKeys: [...months.keys()].sort().slice(-12), uniq: per.size, sekali: [...per.values()].filter((n) => n === 1).length, tetap: [...per.values()].filter((n) => n >= 2).length, kadar: pct(tc, ta), hadir: d.registrations.length };
+}
+const monthLabel = (k) => { const [y, m] = k.split('-').map(Number); return new Date(y, m - 1, 1).toLocaleDateString('ms-MY', { month: 'short', year: '2-digit' }); };
+Tabs.laporan = (el) => {
+  const d = A.snap, R = buildReport(d), withQ = R.rows.filter((r) => r.questions.length);
+  if (!withQ.some((r) => r.s.id === A.repSel)) A.repSel = withQ[withQ.length - 1]?.s.id;
+  const sel = withQ.find((r) => r.s.id === A.repSel);
+  const rc = (k) => (k === null ? '' : k >= 70 ? '' : k >= 40 ? 'mid' : 'low');
+  el.innerHTML = `
+    <section class="head-row" style="margin-bottom:14px"><div><h2 style="margin:0">Laporan Automatik</h2><p class="muted small" style="margin:4px 0 0">Dikira terus daripada data kehadiran & jawapan.</p></div>
+      <div class="btn-row"><button class="btn btn-primary btn-sm" id="csvSess">${ICON.download} CSV Sesi</button><button class="btn btn-ghost btn-sm" id="csvQ">${ICON.download} CSV Soalan</button></div></section>
+    <div class="stats">
+      <div class="stat"><b>${R.rows.length}</b><span>Sesi</span></div><div class="stat"><b>${R.hadir}</b><span>Jumlah kehadiran</span></div>
+      <div class="stat"><b>${R.uniq}</b><span>Peserta unik</span></div><div class="stat"><b>${R.kadar ?? '-'}${R.kadar === null ? '' : '%'}</b><span>Kadar jawapan betul</span></div>
+      <div class="stat"><b>${R.uniq ? pct(R.tetap, R.uniq) + '%' : '-'}</b><span>Peserta tetap (≥2 sesi)</span></div>
+    </div>
+    <div class="grid grid-2">
+      <section class="card"><h3>Trend Bulanan Kehadiran</h3><canvas class="chart" id="chartMonth" role="img" aria-label="Carta kehadiran bulanan"></canvas>
+        <div class="legend"><span><i style="background:var(--c-reg)"></i>Tetap</span><span><i style="background:var(--c-new)"></i>Baru</span></div></section>
+      <section class="card"><h3>Peserta Baru vs Tetap</h3>
+        <div class="bar-row"><div class="bar-head"><span>Tetap — hadir ≥ 2 sesi</span><b>${R.tetap} (${pct(R.tetap, R.uniq) ?? 0}%)</b></div><div class="bar"><i style="width:${pct(R.tetap, R.uniq) ?? 0}%;background:var(--c-reg)"></i></div></div>
+        <div class="bar-row"><div class="bar-head"><span>Sekali sahaja</span><b>${R.sekali} (${pct(R.sekali, R.uniq) ?? 0}%)</b></div><div class="bar"><i style="width:${pct(R.sekali, R.uniq) ?? 0}%;background:var(--c-new)"></i></div></div>
+        <div class="table-wrap" style="margin-top:12px"><table><thead><tr><th>Bulan</th><th class="num">Sesi</th><th class="num">Baru</th><th class="num">Tetap</th></tr></thead><tbody>${R.monthKeys.map((k) => { const m = R.months.get(k); return `<tr><td>${esc(monthLabel(k))}</td><td class="num">${m.sesi}</td><td class="num">${m.baru}</td><td class="num">${m.tetap}</td></tr>`; }).join('') || '<tr><td colspan="4" class="muted">Tiada data</td></tr>'}</tbody></table></div></section>
+    </div>
+    <section class="card" style="margin-top:14px"><h3>Kehadiran Setiap Sesi</h3>${R.rows.length ? `<div class="table-wrap"><table id="tblSess"><thead><tr><th>Tarikh</th><th>Sesi</th><th class="num">Hadir</th><th class="num">Baru</th><th class="num">Tetap</th><th class="num">Menjawab</th><th class="num">Kadar Betul</th><th class="num">Tiket</th><th class="num">Pemenang</th></tr></thead>
+      <tbody>${[...R.rows].reverse().map((r) => `<tr><td>${esc(fmtDateShort(r.s.date))}</td><td class="wrap"><b>${esc(r.s.title)}</b></td><td class="num"><b>${r.hadir}</b></td><td class="num">${r.baru}</td><td class="num">${r.tetap}</td><td class="num">${r.menjawab}</td><td class="num">${r.kadar === null ? '-' : r.kadar + '%'}</td><td class="num">${r.tiket}</td><td class="num">${r.pemenang}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">Belum ada sesi.</p>'}</section>
+    <section class="card" style="margin-top:14px"><div class="card-title"><h3>Kadar Jawapan Betul Setiap Soalan</h3>
+      ${withQ.length ? `<div class="field" style="margin:0;min-width:220px;flex:1;max-width:380px"><label for="repSel" class="sr-only">Sesi</label><select id="repSel">${[...withQ].reverse().map((r) => `<option value="${r.s.id}" ${r.s.id === A.repSel ? 'selected' : ''}>${esc(r.s.title)} — ${esc(fmtDateShort(r.s.date))}</option>`).join('')}</select></div>` : ''}</div>
+      ${sel ? sel.questions.map((x, i) => `<div class="bar-row"><div class="bar-head"><span><b>${i + 1}.</b> ${esc(x.q.text.replace(/^Lengkapkan pernyataan daripada khutbah: /, ''))}</span><b>${x.kadar === null ? 'Tiada jawapan' : `${x.kadar}% (${x.betul}/${x.dijawab})`}</b></div><div class="bar"><i class="${rc(x.kadar)}" style="width:${x.kadar ?? 0}%"></i></div><div class="small muted" style="margin-top:4px">Jawapan: ${esc(x.q.options[x.q.correctIndex])}</div></div>`).join('') : '<p class="muted">Tiada soalan.</p>'}
+    </section>`;
+  Charts.bar($('#chartMonth'), { labels: R.monthKeys.map(monthLabel), series: [{ color: '--c-reg', values: R.monthKeys.map((k) => R.months.get(k).tetap) }, { color: '--c-new', values: R.monthKeys.map((k) => R.months.get(k).baru) }] });
+  const rs = $('#repSel'); if (rs) rs.onchange = (e) => { A.repSel = e.target.value; A.renderTab(); };
+  $('#csvSess').onclick = () => { csvDownload(['Tarikh', 'Sesi', 'Templat', 'Penceramah', 'Hadir', 'Baru', 'Tetap', 'Menjawab', 'Jawapan', 'Betul', 'Kadar Betul (%)', 'Tiket', 'Pemenang'], R.rows.map((r) => [r.s.date, r.s.title, d.templates.find((t) => t.id === r.s.templateId)?.name || '', r.s.speaker, r.hadir, r.baru, r.tetap, r.menjawab, r.jawapan, r.betul, r.kadar ?? '', r.tiket, r.pemenang]), `laporan-sesi-${today()}.csv`); toast('CSV sesi dimuat turun', 'success'); };
+  $('#csvQ').onclick = () => { const out = []; R.rows.forEach((r) => r.questions.forEach((x, i) => out.push([r.s.date, r.s.title, i + 1, x.q.text, x.q.options[x.q.correctIndex], x.dijawab, x.betul, x.kadar ?? '']))); csvDownload(['Tarikh', 'Sesi', 'No', 'Soalan', 'Jawapan Betul', 'Dijawab', 'Betul', 'Kadar Betul (%)'], out, `laporan-soalan-${today()}.csv`); toast('CSV soalan dimuat turun', 'success'); };
+};
+
+/* ----- Tab: Tetapan ----- */
+Tabs.tetapan = (el) => {
+  const st = A.snap.settings;
+  el.innerHTML = `
+    <div class="note ${MODE === 'demo' ? 'warn' : 'ok'}" style="margin-bottom:14px">${ICON.info}<span>${MODE === 'demo' ? '<b>MOD DEMO</b> — data disimpan dalam pelayar ini sahaja dan disegerakkan antara tab. Isi <code>CONFIG.SUPABASE_URL</code> & <code>SUPABASE_ANON_KEY</code> untuk masa nyata merentas peranti.' : '<b>Supabase</b> — data masa nyata merentas peranti.'}</span></div>
+    <div class="grid grid-2">
+      <section class="card"><form id="fMasjid" novalidate><h3>Nama Masjid</h3><div class="field"><label for="mName">Nama masjid</label><input id="mName" maxlength="80" value="${esc(st.masjidName)}"></div><button class="btn btn-primary btn-sm">Simpan</button></form></section>
+      <section class="card"><form id="fPin" novalidate><h3>Tukar PIN AJK</h3><div class="row"><div class="field"><label for="pOld">PIN semasa</label><input id="pOld" type="password" inputmode="numeric" maxlength="8"></div><div class="field"><label for="pNew">PIN baharu</label><input id="pNew" type="password" inputmode="numeric" maxlength="8"></div></div><button class="btn btn-primary btn-sm">Tukar PIN</button></form></section>
+      <section class="card"><form id="fStreak" novalidate><h3>Streak & Tiket Bonus</h3><div class="row"><div class="field"><label for="stTh">Setiap streak ke-</label><input id="stTh" type="number" min="0" max="52" value="${st.streak.threshold}"></div><div class="field"><label for="stBo">Tiket bonus</label><input id="stBo" type="number" min="0" max="20" value="${st.streak.bonus}"></div></div>
+        <p class="hint">Cth: 3 & 2 → hadir 3, 6, 9… sesi berturut-turut (templat sama) = +2 tiket. 0 = matikan.</p><button class="btn btn-primary btn-sm">Simpan</button></form></section>
+      <section class="card"><form id="fGeo" novalidate><h3>Pengesahan Lokasi (pilihan)</h3><label class="check"><input type="checkbox" id="gOn" ${st.geo.enabled ? 'checked' : ''}> Wajibkan jemaah dalam radius masjid</label>
+        <div class="row"><div class="field"><label for="gLat">Latitud</label><input id="gLat" inputmode="decimal" value="${st.geo.lat ?? ''}"></div><div class="field"><label for="gLng">Longitud</label><input id="gLng" inputmode="decimal" value="${st.geo.lng ?? ''}"></div><div class="field"><label for="gRad">Radius (m)</label><input id="gRad" type="number" min="20" max="5000" value="${st.geo.radius}"></div></div>
+        <div class="btn-row"><button class="btn btn-primary btn-sm">Simpan</button><button type="button" class="btn btn-ghost btn-sm" id="gHere">${ICON.pin} Guna lokasi semasa</button></div></form></section>
+    </div>
+    <section class="card" style="margin-top:14px"><h3>Data</h3><div class="btn-row">
+      <button class="btn btn-ghost btn-sm" id="btnExportJson">${ICON.download} Sandaran JSON</button>
+      ${MODE === 'demo' ? `<label class="btn btn-ghost btn-sm">${ICON.plus} Pulih dari JSON<input type="file" id="fileImport" accept="application/json,.json" hidden></label>
+      <button class="btn btn-ghost btn-sm" id="btnDemo">${ICON.sparkle} Muat Data Contoh</button>
+      <button class="btn btn-danger btn-sm" id="btnWipe">${ICON.trash} Padam Semua Data</button>` : ''}
+    </div><p class="hint" style="margin-top:10px">Pasang panel ini pada telefon: menu pelayar → <b>Tambah ke Skrin Utama</b>.</p></section>`;
+  $('#fMasjid').onsubmit = async (e) => { e.preventDefault(); const n = $('#mName').value.trim(); if (!n) return toast('Nama masjid tidak boleh kosong', 'error'); await API.write([{ t: 'settings', row: { masjidName: n } }]); paintBrand(n); toast('Disimpan', 'success'); };
+  $('#fPin').onsubmit = async (e) => {
+    e.preventDefault(); const old = $('#pOld').value.trim(), nw = $('#pNew').value.trim();
+    if (!/^\d{4,8}$/.test(nw)) return toast('PIN baharu mesti 4–8 digit', 'error');
+    const r = await API.write([{ t: 'pin', old, pin: nw }]);
+    if (r && r.ok === false) return toast(r.reason || 'PIN semasa salah', 'error');
+    SS.set(K.pin, nw); toast('PIN ditukar', 'success'); Router.render();
+  };
+  $('#fStreak').onsubmit = async (e) => { e.preventDefault(); await API.write([{ t: 'settings', row: { streak: { threshold: Math.max(0, Math.floor(+$('#stTh').value || 0)), bonus: Math.max(0, Math.floor(+$('#stBo').value || 0)) } } }]); toast('Tetapan streak disimpan', 'success'); A.reload(); };
+  $('#fGeo').onsubmit = async (e) => {
+    e.preventDefault(); const on = $('#gOn').checked, lat = parseFloat($('#gLat').value), lng = parseFloat($('#gLng').value), radius = Math.floor(+$('#gRad').value || 0);
+    if (on && (!isFinite(lat) || !isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180)) return toast('Sila isi koordinat yang sah', 'error');
+    if (on && radius < 20) return toast('Radius minimum 20 m', 'error');
+    await API.write([{ t: 'settings', row: { geo: { enabled: on, lat: isFinite(lat) ? lat : null, lng: isFinite(lng) ? lng : null, radius: radius || 150 } } }]); toast('Tetapan lokasi disimpan', 'success');
+  };
+  $('#gHere').onclick = async () => { try { const c = await getPosition(); $('#gLat').value = c.latitude.toFixed(6); $('#gLng').value = c.longitude.toFixed(6); toast('Koordinat diisi — klik Simpan', 'success'); } catch { toast('Tidak dapat membaca lokasi', 'error'); } };
+  $('#btnExportJson').onclick = async () => { const d = await API.snapshot(); downloadBlob(JSON.stringify(d, null, 2), `ganjaran-ilmu-${today()}.json`, 'application/json'); };
+  if (MODE !== 'demo') return;
+  $('#fileImport').onchange = async (e) => {
+    const f = e.target.files[0]; if (!f) return; e.target.value = '';
+    try {
+      const data = JSON.parse(await f.text());
+      if (!Array.isArray(data.sessions) || !Array.isArray(data.participants)) throw new Error('format');
+      if (!(await confirmDialog('Gantikan semua data semasa dengan fail sandaran ini?', 'Pulihkan', true))) return;
+      await API.write([{ t: 'replace', data }]); toast('Data dipulihkan', 'success'); A.sel = null; A.reload();
+    } catch { toast('Fail JSON tidak sah', 'error'); }
+  };
+  $('#btnDemo').onclick = async () => { if (!(await confirmDialog('Tambah templat, 13 sesi, 18 peserta dan data kehadiran contoh?', 'Tambah'))) return; seedDemo(); toast('Data contoh ditambah', 'success'); A.sel = null; A.reload(); };
+  $('#btnWipe').onclick = async () => { if (!(await confirmDialog('Padam <b>SEMUA</b> data (kecuali tetapan)? Muat turun sandaran dahulu jika perlu.', 'Padam semua', true))) return; await API.write([{ t: 'replace', data: { settings: A.snap.settings }, keepSettings: true }]); toast('Semua data dipadam'); A.sel = null; A.reload(); };
+};
+
+/* =====================================================================
+   13. SKRIN BESAR (#skrin) — QR dinamik, soalan & roda cabutan
+   ===================================================================== */
+const Skrin = { snap: null, sid: null, spinning: false, segs: [], rot: 0, lastState: null, qi: 0, overlay: null };
+function mountDynamicQR(box, sid, onTick) {
+  let slot = -1, busy = false;
+  const paint = async () => {
+    const cur = Token.slot();
+    if (cur !== slot && !busy) {
+      busy = true;
+      try {
+        const tok = await API.token(sid); slot = cur;
+        const url = `${location.origin}${location.pathname}#j?s=${sid}&t=${tok}`;
+        box.dataset.url = url; box.innerHTML = '';
+        if (typeof QRCode === 'undefined') box.innerHTML = '<p style="color:#333;margin:0">Penjana QR tidak dimuatkan (tiada internet?)</p>';
+        else new QRCode(box, { text: url, width: 512, height: 512, colorDark: '#053d2f', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+      } catch (e) { console.warn(e); } finally { busy = false; }
+    }
+    onTick && onTick(Token.msLeft());
+  };
+  paint(); every(1000, paint);
+}
+Views.skrin = async (app, params) => {
+  if (!Auth.ok()) { document.body.className = 'mode-admin'; return renderPinGate(app, 'Skrin Besar'); }
+  const alive = Router.alive();
+  Skrin.snap = await API.snapshot().catch(() => null);
+  if (!alive() || !Skrin.snap) return;
+  const d = Skrin.snap;
+  const pick = [...d.sessions].sort((a, b) => sessionKey(b).localeCompare(sessionKey(a)));
+  Skrin.sid = d.sessions.some((s) => s.id === params.s) ? params.s : (pick.find((s) => ['registration', 'questions', 'closed', 'drawing'].includes(s.state)) || pick[0])?.id;
+  Skrin.lastState = null; Skrin.spinning = false; Skrin.overlay = null;
+  app.innerHTML = `<div class="skrin" id="skrin">
+    <div class="skrin-top">
+      <div class="skrin-brand">${esc(d.settings.masjidName)}<span>${CONFIG.APP_NAME}</span></div>
+      <label class="sr-only" for="skSel">Sesi</label>
+      <select id="skSel">${pick.map((s) => `<option value="${s.id}" ${s.id === Skrin.sid ? 'selected' : ''}>${esc(s.title)} — ${esc(fmtDateShort(s.date))}</option>`).join('')}</select>
+      <button class="btn btn-ghost btn-sm" id="btnSound" aria-label="Bunyi">${Sound.on ? ICON.sound : ICON.mute}</button>
+      <button class="btn btn-ghost btn-sm" id="btnFs">${ICON.expand}<span>Skrin Penuh</span></button>
+    </div>
+    <div class="skrin-body" id="skBody"></div>
+  </div>`;
+  $('#skSel').onchange = (e) => { location.hash = 'skrin?s=' + e.target.value; };
+  $('#btnSound').onclick = (e) => { Sound.on = !Sound.on; e.currentTarget.innerHTML = Sound.on ? ICON.sound : ICON.mute; if (Sound.on) Sound.tick(); };
+  const stage = $('#skrin'), fb = $('#btnFs');
+  fb.onclick = async () => { try { if (document.fullscreenElement) await document.exitFullscreen(); else await stage.requestFullscreen(); } catch { toast('Skrin penuh tidak disokong', 'error'); } };
+  document.onfullscreenchange = () => { const sp = $('span', fb); if (sp) sp.textContent = document.fullscreenElement ? 'Keluar' : 'Skrin Penuh'; if (Skrin.segs && $('#wheel')) Wheel.draw($('#wheel'), Skrin.segs, Skrin.rot); };
+  if (!Skrin.sid) { $('#skBody').innerHTML = '<h1 class="skrin-title">Tiada sesi</h1><p class="skrin-sub">Cipta sesi dalam Panel AJK.</p>'; return; }
+  skrinRender();
+  Router.dataHandler = async () => {
+    const s2 = await API.snapshot().catch(() => null); if (!s2 || !alive()) return;
+    Skrin.snap = s2;
+    if (Skrin.spinning) return; // jangan ganggu putaran; dilukis semula selepas tamat
+    skrinRender();
+  };
+  every(2000, () => autoCloseQuestions(Skrin.snap));
+};
+function skrinSession() { return Skrin.snap.sessions.find((s) => s.id === Skrin.sid); }
+function skrinRender() {
+  const d = Skrin.snap, s = skrinSession(), body = $('#skBody'); if (!s || !body) return;
+  const regs = d.registrations.filter((r) => r.sessionId === s.id).length;
+  const answered = new Set(d.answers.filter((a) => a.sessionId === s.id).map((a) => a.participantId)).size;
+  if (Skrin.lastState === s.state && ['registration', 'questions', 'closed'].includes(s.state)) { // kemas kini kiraan sahaja
+    const lc = $('#skCount'); if (lc) lc.textContent = s.state === 'questions' ? `✍️ ${answered} / ${regs} jemaah telah menjawab` : `👥 ${regs} jemaah hadir${s.state === 'closed' ? ` · ${answered} menjawab · ${Logic.tickets(d, s.id).length} tiket` : ''}`;
+    return;
+  }
+  if (Skrin.lastState === s.state && s.state === 'drawing') return skrinDrawSide();
+  Skrin.lastState = s.state; Skrin.overlay = null;
+  body.dataset.state = s.state;
+  const clear = () => { Router.timers.splice(0).forEach((t) => { clearInterval(t); clearTimeout(t); }); every(2000, () => autoCloseQuestions(Skrin.snap)); };
+  clear();
+  if (s.state === 'draft') {
+    body.innerHTML = `<h1 class="skrin-title">${esc(s.title)}</h1><p class="skrin-sub">Sesi belum dibuka. Tekan <b>Buka Pendaftaran</b> di Panel AJK.</p>`;
+  } else if (s.state === 'registration') {
+    body.innerHTML = `<h1 class="skrin-title">${esc(s.title)}</h1>
+      <div class="skrin-cta">Imbas untuk sahkan kehadiran</div>
+      <div class="qr-big" id="qrBig"></div>
+      <div class="rot"><div class="rot-bar"><i id="rotBar" style="width:100%"></i></div><div class="skrin-sub" style="margin-top:6px">Kod bertukar dalam <b id="rotLeft">60</b> saat</div></div>
+      <div><span class="free-pill">✓ Penyertaan PERCUMA</span></div>
+      <div class="live-count" id="skCount">👥 ${regs} jemaah hadir</div>`;
+    mountDynamicQR($('#qrBig'), s.id, (ms) => { const l = $('#rotLeft'); if (l) l.textContent = Math.ceil(ms / 1000); const b = $('#rotBar'); if (b) b.style.width = (ms / CONFIG.TOKEN_WINDOW_MS) * 100 + '%'; });
+  } else if (s.state === 'questions') {
+    const qs = Logic.approved(d, s.id);
+    body.innerHTML = `<div class="sq-grid">
+      <div id="sqBox"></div>
+      <div class="side" style="text-align:center">
+        <div class="skrin-sub">Masa berbaki</div><div class="big-timer" id="skTimer">--:--</div>
+        <div class="live-count" id="skCount" style="margin:10px 0">✍️ ${answered} / ${regs} jemaah telah menjawab</div>
+        <div class="qr-small" id="qrSmall"></div><div class="skrin-sub small" style="margin-top:6px">Lewat? Imbas untuk hadir</div>
+      </div></div>`;
+    Skrin.qi = 0;
+    const showQ = () => {
+      const q = qs[Skrin.qi % qs.length], box = $('#sqBox'); if (!box || !q) return;
+      box.innerHTML = `<div class="sq-card"><div class="qn">Soalan ${Skrin.qi % qs.length + 1} / ${qs.length}</div><h2>${esc(q.text)}</h2><div class="sq-opts">${q.options.map((o) => `<div>${esc(o)}</div>`).join('')}</div></div>`;
+      Skrin.qi++;
+    };
+    showQ(); every(12000, showQ);
+    mountDynamicQR($('#qrSmall'), s.id);
+    every(1000, () => { const t = $('#skTimer'); if (t) t.textContent = fmtDuration(Date.parse(s.questionsCloseAt) - Clock.now()); });
+  } else if (s.state === 'closed') {
+    body.innerHTML = `<div class="big-icon gold" style="background:rgba(240,209,138,.15)">${ICON.lock}</div><h1 class="skrin-title">Soalan telah ditutup</h1>
+      <div class="live-count" id="skCount">👥 ${regs} jemaah hadir · ${answered} menjawab · ${Logic.tickets(d, s.id).length} tiket</div>
+      <p class="skrin-sub">Cabutan akan bermula sebentar lagi. Terima kasih kerana mendengar dengan teliti!</p>`;
+  } else if (s.state === 'drawing') {
+    skrinDrawView();
+  } else {
+    const ws = Logic.winners(d, s.id), nameOf = (id) => d.participants.find((p) => p.id === id)?.name || '-';
+    body.innerHTML = `<h1 class="skrin-title">Tahniah kepada pemenang!</h1><p class="skrin-sub">${esc(s.title)} · ${esc(fmtDate(s.date))}</p>
+      ${ws.length ? `<ul class="wlist" style="max-width:720px;margin:0 auto;width:100%">${ws.map((w) => `<li><b>🎁 ${esc(w.prize)}</b><span>${esc(nameOf(w.participantId))}</span></li>`).join('')}</ul>` : '<p class="skrin-sub">Tiada pemenang untuk sesi ini.</p>'}
+      <p class="skrin-sub">Jumpa sesi akan datang — penyertaan PERCUMA!</p>`;
+  }
+}
+/** Segmen roda semasa (sebelum putaran): peserta layak unik, maks 40. */
+function idleSegments(d, sid) {
+  const ids = [...new Set(Logic.pool(d, sid))];
+  const pick = ids.length > CONFIG.WHEEL_MAX ? shuffle(ids).slice(0, CONFIG.WHEEL_MAX) : ids;
+  return pick.map((id) => ({ id, name: d.participants.find((p) => p.id === id)?.name || '-' }));
+}
+function skrinDrawView() {
+  const d = Skrin.snap, s = skrinSession(), body = $('#skBody');
+  Skrin.segs = idleSegments(d, s.id); Skrin.rot = 0;
+  body.innerHTML = `<div class="draw-grid">
+    <div class="wheel-wrap"><div class="pointer" aria-hidden="true"></div><canvas id="wheel" role="img" aria-label="Roda cabutan"></canvas><div id="winBox"></div></div>
+    <div class="side" id="drawSide"></div></div>`;
+  Wheel.draw($('#wheel'), Skrin.segs, Skrin.rot);
+  skrinDrawSide();
+}
+function skrinDrawSide() {
+  const d = Skrin.snap, s = skrinSession(), side = $('#drawSide'); if (!side) return;
+  const ws = Logic.winners(d, s.id), prizes = s.prizes || [], next = prizes[ws.length];
+  const pool = [...new Set(Logic.pool(d, s.id))], nameOf = (id) => d.participants.find((p) => p.id === id)?.name || '-';
+  const msg = !next ? '🎉 Semua hadiah telah dicabut' : !pool.length ? (ws.length ? `Tiada lagi peserta layak — ${prizes.length - ws.length} hadiah tidak dapat dicabut` : 'Tiada peserta layak (tiada tiket) untuk cabutan') : `${pool.length} peserta layak · ${Logic.pool(d, s.id).length} tiket`;
+  side.innerHTML = `
+    <span class="prize-label" id="prizeLabel">${next ? `🎁 Hadiah ${ws.length + 1}/${prizes.length}: ${esc(next)}` : '🎉 Selesai'}</span>
+    <button class="btn btn-gold btn-lg btn-block" id="btnSpin" ${!next || !pool.length || Skrin.spinning ? 'disabled' : ''}>${ICON.sparkle} Putar Roda <small style="opacity:.8">(Space)</small></button>
+    <p class="skrin-sub" id="drawMsg" style="margin:12px 0 0">${esc(msg)}</p>
+    ${(!next || !pool.length) ? `<button class="btn btn-ghost btn-block" id="btnFinish" style="margin-top:12px">${ICON.check} Tamatkan Sesi</button>` : ''}
+    <h3 style="color:#fbe7b0;margin:18px 0 0">Pemenang</h3>
+    <ul class="wlist" id="wList">${ws.length ? ws.map((w) => `<li><b>${w.order}.</b><span>${esc(nameOf(w.participantId))}<small>${esc(w.prize)}</small></span></li>`).join('') : '<li><span>Belum ada</span></li>'}</ul>`;
+  $('#btnSpin').onclick = () => skrinSpin();
+  const fin = $('#btnFinish'); if (fin) fin.onclick = async () => { const r = await API.setState(s.id, 'done'); if (!r.ok) toast(r.reason, 'error'); };
+}
+async function skrinSpin() {
+  if (Skrin.spinning) return;
+  const s = skrinSession(); if (!s || s.state !== 'drawing') return;
+  Skrin.spinning = true;
+  const btn = $('#btnSpin'); if (btn) btn.disabled = true;
+  $('#winBox').innerHTML = '';
+  const r = await API.draw(s.id).catch((e) => ({ ok: false, reason: e.message }));
+  if (!r.ok) {
+    Skrin.spinning = false;
+    toast({ nopool: 'Tiada lagi peserta layak', noprize: 'Semua hadiah telah dicabut', spinning: 'Tunggu putaran sebelumnya selesai', state: 'Sesi bukan dalam keadaan cabutan' }[r.reason] || r.reason, 'error');
+    Skrin.snap = await API.snapshot(); return skrinDrawSide();
+  }
+  const canvas = $('#wheel');
+  Skrin.segs = r.wheel;
+  const idx = r.wheel.findIndex((x) => x.id === r.winner.participantId);
+  $('#drawMsg').textContent = 'Roda sedang berputar…';
+  const res = await Wheel.spin(canvas, r.wheel, idx, r.winner.spinMs, Skrin.rot);
+  Skrin.rot = res.rot;
+  $('#winBox').innerHTML = `<div class="win-overlay" role="status"><div><div class="wl">Tahniah!</div><div class="wn" id="winName">${esc(res.landed.name)}</div><div class="wp">🎁 ${esc(r.winner.prize)}</div></div></div>`;
+  confetti(4500);
+  Skrin.spinning = false;
+  Skrin.snap = await API.snapshot().catch(() => Skrin.snap);
+  skrinDrawSide();
+  // Keluarkan pemenang daripada roda untuk putaran seterusnya
+  Skrin.segs = idleSegments(Skrin.snap, s.id);
+  const ss = skrinSession();
+  if (Logic.winners(Skrin.snap, s.id).length >= (ss.prizes || []).length) later(4000, async () => { const x = await API.setState(s.id, 'done'); if (x.ok) toast('Semua hadiah telah dicabut — sesi selesai', 'success'); });
+}
+document.addEventListener('keydown', (e) => {
+  if (Router.current !== 'skrin' || (e.code !== 'Space' && e.key !== 'Enter')) return;
+  if (document.querySelector('.modal-back')) return;
+  const el = document.activeElement, tag = el?.tagName || '';
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag)) return;
+  if ((tag === 'BUTTON' || tag === 'A') && !['btnSpin', 'btnFs', 'btnSound'].includes(el.id)) return;
+  const b = $('#btnSpin');
+  if (b && !b.disabled) { e.preventDefault(); skrinSpin(); }
+});
+
+/* =====================================================================
+   14. DATA CONTOH (mod demo) — templat, streak, laporan
+   ===================================================================== */
+const DEMO_TEXTS = [
+  `Sidang Jumaat yang dirahmati Allah sekalian. Marilah kita meningkatkan ketakwaan kepada Allah dengan melaksanakan segala suruhan-Nya dan meninggalkan segala larangan-Nya. Masjid merupakan pusat pembangunan ummah yang menyatukan masyarakat dalam ikatan ukhuwah. Rasulullah SAW membina Masjid Quba sebagai langkah pertama selepas peristiwa hijrah ke Madinah. Solat berjemaah mempunyai kelebihan dua puluh tujuh darjat berbanding solat bersendirian. Memakmurkan masjid bukan sekadar hadir untuk solat, tetapi juga menghadiri majlis ilmu dan aktiviti kemasyarakatan. Golongan belia perlu didekatkan dengan masjid supaya mereka membesar dengan jiwa yang cintakan kebaikan. Ibu bapa hendaklah membawa anak-anak ke masjid bagi memupuk kecintaan terhadap rumah Allah sejak kecil. Sifat istiqamah dalam beribadah lebih disukai Allah walaupun amalan itu sedikit. Marilah kita menjadikan masjid sebagai tempat yang mesra dan menyenangkan kepada semua lapisan masyarakat.`,
+  `Sidang Jumaat yang dikasihi sekalian. Sedekah merupakan amalan mulia yang membersihkan harta dan menyucikan jiwa pemberinya. Rasulullah SAW mengingatkan bahawa sedekah tidak akan mengurangkan harta, malah Allah akan menggandakan ganjarannya. Pemberian yang paling utama ialah ketika seseorang itu sihat dan masih berhajat kepada hartanya. Sedekah juga boleh dilakukan dengan senyuman, membuang halangan di jalan dan menolong jiran yang memerlukan. Amalan bersedekah secara berterusan walaupun sedikit lebih disukai berbanding pemberian besar yang jarang dilakukan. Zakat pula merupakan kewajipan yang menjadi hak golongan asnaf dalam masyarakat. Institusi masjid berperanan menyalurkan bantuan kepada fakir miskin dan anak yatim di kariah. Semoga kita tergolong dalam kalangan hamba yang pemurah dan prihatin terhadap kesusahan orang lain.`,
+];
+function seedDemo() {
+  LocalAPI.tx((d) => {
+    const now = new Date(), off = (n) => { const x = new Date(now); x.setDate(x.getDate() + n); return ymd(x); };
+    const tJ = { id: uid('t_'), name: 'Khutbah Jumaat', title: 'Khutbah Jumaat', speaker: 'Imam Masjid', weekday: 5, startTime: '13:30', endTime: '14:30', answerMinutes: 5, prizes: ['Sejadah Premium', 'Al-Quran Terjemahan', 'Baucar Kedai Buku RM30'], createdAt: nowISO() };
+    const tK = { id: uid('t_'), name: 'Kuliah Maghrib Selasa', title: 'Kuliah Maghrib', speaker: 'Ustaz Hafiz Rahman', weekday: 2, startTime: '20:00', endTime: '21:00', answerMinutes: 5, prizes: ['Kitab Riyadhus Solihin', 'Kopiah & Tasbih'], createdAt: nowISO() };
+    d.templates.push(tJ, tK);
+    const mk = (t, title, date, text, state) => {
+      const s = { id: uid('s_'), templateId: t.id, title, speaker: t.speaker, date, startTime: t.startTime, endTime: t.endTime, answerMinutes: t.answerMinutes, prizes: [...t.prizes], transcript: text, summary: extractSummary(text, 4), state, stateAt: nowISO(), questionsOpenedAt: null, questionsCloseAt: null, rev: 0, createdAt: nowISO() };
+      d.sessions.push(s);
+      extractQuestions(text, 5).forEach((q) => d.questions.push({ id: uid('q_'), sessionId: s.id, ...q, status: 'lulus', source: 'auto', createdAt: nowISO() }));
+      return s;
+    };
+    const tj = ['Kelebihan Solat Berjemaah', 'Memakmurkan Masjid, Membina Ummah', 'Sedekah Penyuci Jiwa', 'Adab Bertetangga', 'Menjaga Lisan', 'Keberkatan Masa', 'Ibu Bapa Syurga Anak', 'Istiqamah Dalam Ibadah'];
+    const tk = ['Tafsir Surah Al-Asr', 'Sirah: Hijrah ke Madinah', 'Fiqh Bersuci', 'Akhlak Rasulullah SAW'];
+    const jum = tj.map((t, i) => mk(tJ, t, off(-7 * (8 - i)), DEMO_TEXTS[i % 2], 'done'));
+    const kul = tk.map((t, i) => mk(tK, t, off(-7 * (4 - i) - 3), DEMO_TEXTS[(i + 1) % 2], 'done'));
+    const live = mk(tJ, 'Menuntut Ilmu Sepanjang Hayat', off(0), DEMO_TEXTS[0], 'registration');
+    const names = ['Ahmad Zaki bin Ismail', 'Nurul Huda binti Hassan', 'Muhammad Faris bin Azman', 'Siti Aisyah binti Omar', 'Abdul Rahman bin Yusof', 'Hafizah binti Kamal', 'Iskandar bin Zulkifli', 'Farah Nabilah binti Salleh', 'Khairul Anuar bin Ali', 'Zainab binti Ibrahim', 'Amirul Hakim bin Rosli', 'Nor Azlina binti Mat', 'Haji Osman bin Daud', 'Rohani binti Ahmad', 'Luqman Hakim bin Said', 'Mariam binti Yaakob'];
+    const people = names.map((n, i) => ({ n, phone: '01' + String(2 + (i % 7)) + String(3000000 + i * 411731).slice(0, 7), i }));
+    const pattern = (i) => i < 4 ? [1, 1, 1, 1, 1, 1, 1, 1] : i < 7 ? [1, 1, 1, 1, 1, 1, 0, 1] : i < 11 ? [0, 0, 0, 0, 0, 1, 1, 1] : [0, 1, 0, 1, 0, 0, 1, 0].map((v, k) => ((k + i) % 3 === 0 ? 1 : v));
+    const attend = (s, person, ratio, answer = true) => {
+      const at = new Date(`${s.date}T${s.startTime}`).toISOString();
+      let p = d.participants.find((x) => x.phone === person.phone);
+      if (!p) { p = { id: uid('p_'), name: person.n, phone: person.phone, secret: randomSecret(), createdAt: at }; d.participants.push(p); }
+      if (d.registrations.some((r) => r.sessionId === s.id && r.participantId === p.id)) return;
+      d.registrations.push({ id: uid('r_'), sessionId: s.id, participantId: p.id, regNo: d.registrations.filter((r) => r.sessionId === s.id).length + 1, checkinAt: at, dist: null, createdAt: at });
+      if (answer) Logic.approved(d, s.id).forEach((q) => { const ci = Math.random() < ratio ? q.correctIndex : randInt(4); d.answers.push({ id: uid('a_'), sessionId: s.id, participantId: p.id, questionId: q.id, choiceIndex: ci, isCorrect: ci === q.correctIndex, createdAt: at }); });
+    };
+    [...jum, ...kul].sort((a, b) => sessionKey(a).localeCompare(sessionKey(b))).forEach((s) => {
+      const ji = jum.indexOf(s), ki = kul.indexOf(s);
+      people.forEach((p) => { if (ji >= 0 && pattern(p.i)[ji]) attend(s, p, p.i < 4 ? .85 : .65); if (ki >= 0 && (p.i + ki) % 2 === 0 && p.i < 12) attend(s, p, .7); });
+    });
+    [['Tan Sri Kamarul bin Hashim', '0192223344', 2], ['Aminah binti Salleh', '0145556677', 5]].forEach(([n, phone, k]) => attend(jum[k], { n, phone }, .6));
+    people.slice(0, 8).forEach((p) => attend(live, p, 0, false)); // 8 sudah hadir hari ini (belum menjawab)
+    [...jum, ...kul].forEach((s) => s.prizes.slice(0, 2).forEach((prize, i) => {
+      const pool = Logic.pool(d, s.id); if (!pool.length) return;
+      const at = new Date(`${s.date}T${s.endTime}`).toISOString();
+      d.winners.push({ id: uid('w_'), sessionId: s.id, participantId: pool[randInt(pool.length)], prize, order: i + 1, spinMs: 7000, revealAt: at, wheel: [], createdAt: at });
+    }));
+    return { ok: true };
+  });
+}
+
+/* =====================================================================
+   15. MULA
+   ===================================================================== */
+function paintBrand(name) { if (!name) return; $('#brandSub').textContent = name; $('#footMasjid').textContent = name; }
+(async function boot() {
+  Theme.init();
+  Bus.init();
+  if (MODE === 'supabase') { try { await SupaAPI.init(); } catch (e) { toast('Gagal menyambung ke Supabase', 'error'); console.error(e); } }
+  else paintBrand(LocalAPI.read().settings.masjidName);
+  window.addEventListener('hashchange', () => Router.render());
+  Router.render();
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch((e) => console.warn('SW', e));
+})();
+</script>
+</body>
+</html>

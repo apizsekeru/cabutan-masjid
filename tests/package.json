@@ -1,0 +1,14 @@
+{
+  "name": "ganjaran-ilmu-tests",
+  "private": true,
+  "description": "Ujian end-to-end (Playwright, mod demo) dan ujian fungsi SQL (PGlite) untuk Ganjaran Ilmu Jemaah Masjid",
+  "scripts": {
+    "test": "node e2e.js && node sql.test.mjs",
+    "test:e2e": "node e2e.js",
+    "test:sql": "node sql.test.mjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "playwright-core": "1.63.0"
+  }
+}
