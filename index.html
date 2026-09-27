@@ -16,6 +16,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <!-- Penjana QR (qrcodejs) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<!-- Penjana PDF (jsPDF) — untuk e-book Ringkasan Ilmu -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 /* =====================================================================
@@ -1166,6 +1168,66 @@ function answerLine(text, ans, html = true) {
   if (m && m[1].includes('______')) return html ? esc(m[1]).replace('______', `<b class="ok-text">${esc(ans)}</b>`) : m[1].replace('______', `*${ans}*`);
   return html ? `${esc(text)} → <b class="ok-text">${esc(ans)}</b>` : `${text} → *${ans}*`;
 }
+/** E-book PDF ringkas (1-2 halaman) daripada Ringkasan Ilmu — guna jsPDF (CDN). */
+const Ebook = {
+  ready() { return !!(window.jspdf && window.jspdf.jsPDF); },
+  /** Bina & muat turun PDF ringkasan ilmu untuk seorang jemaah, guna data v.review & v.session sedia ada. */
+  download(v) {
+    if (!this.ready()) { toast('Ciri e-book belum sedia — sila semak sambungan internet & cuba lagi.', 'error'); return; }
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const pageW = doc.internal.pageSize.getWidth(), pageH = doc.internal.pageSize.getHeight();
+      const margin = 48, contentW = pageW - margin * 2;
+      const GREEN = [4, 108, 78], GOLD = [212, 175, 95], INK = [30, 30, 30], MUTED = [110, 110, 110];
+      let y = margin;
+      const ensureSpace = (need) => { if (y + need > pageH - margin) { doc.addPage(); y = margin; } };
+      // Kepala
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(...GREEN);
+      doc.text(String(v.masjidName || CONFIG.APP_NAME).toUpperCase(), margin, y); y += 16;
+      doc.setDrawColor(...GOLD); doc.setLineWidth(2); doc.line(margin, y, margin + contentW, y); y += 22;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(18); doc.setTextColor(...INK);
+      doc.text('Ringkasan Ilmu', margin, y); y += 22;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(12); doc.setTextColor(...GREEN);
+      const titleLines = doc.splitTextToSize(v.session.title || '', contentW);
+      doc.text(titleLines, margin, y); y += titleLines.length * 15;
+      doc.setFontSize(10); doc.setTextColor(...MUTED);
+      doc.text(fmtDate(v.session.date), margin, y); y += 22;
+      // Poin utama
+      const pts = (v.review.summary || []).filter(Boolean);
+      if (pts.length) {
+        ensureSpace(24);
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(...INK);
+        doc.text('Poin Utama', margin, y); y += 18;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
+        pts.forEach((p) => {
+          const lines = doc.splitTextToSize(`•  ${p}`, contentW);
+          ensureSpace(lines.length * 14 + 4);
+          doc.text(lines, margin, y); y += lines.length * 14 + 4;
+        });
+        y += 8;
+      }
+      // Jawapan betul
+      ensureSpace(24);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(...INK);
+      doc.text('Jawapan Betul', margin, y); y += 18;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
+      (v.review.items || []).forEach((it, i) => {
+        const lines = doc.splitTextToSize(`${i + 1}. ${answerLine(it.text, it.answer, false).replace(/\*/g, '')}`, contentW);
+        ensureSpace(lines.length * 14 + 4);
+        doc.text(lines, margin, y); y += lines.length * 14 + 4;
+      });
+      // Kaki
+      ensureSpace(30);
+      y += 6; doc.setDrawColor(...GOLD); doc.setLineWidth(1); doc.line(margin, y, margin + contentW, y); y += 16;
+      doc.setFont('helvetica', 'italic'); doc.setFontSize(10); doc.setTextColor(...MUTED);
+      doc.text('Penyertaan PERCUMA — jom hadir sesi seterusnya! Semoga bermanfaat, insya-Allah.', margin, y);
+      doc.save(`ringkasan-${slug(v.session.title)}.pdf`);
+    } catch (e) {
+      toast('Gagal menjana e-book PDF. Cuba lagi.', 'error');
+    }
+  },
+};
 function validateQ(q) {
   if (!String(q.text || '').trim()) return 'Teks soalan kosong';
   if (q.options.some((o) => !String(o).trim())) return 'Semua 4 pilihan jawapan mesti diisi';
@@ -1493,6 +1555,7 @@ const J = {
   head(v) { return v?.session ? `<div class="session-chip">${esc(v.session.title)} · ${esc(fmtDateShort(v.session.date))}</div>` : ''; },
   reviewHTML(v) {
     if (!v.review) return `<section class="card center"><p class="muted" style="margin:0">${ICON.book.replace('<svg', '<svg style="width:22px;height:22px;vertical-align:-5px"')} Jawapan betul & ringkasan ilmu akan dipaparkan selepas sesi tamat.</p></section>`;
+    this.__reviewV = v;
     const pts = v.review.summary.filter(Boolean);
     const text = [`📚 *Ringkasan Ilmu — ${v.session.title}*`, fmtDate(v.session.date), '', ...(pts.length ? ['*Poin utama:*', ...pts.map((p) => '• ' + p), ''] : []), '*Jawapan betul:*', ...v.review.items.map((it, i) => `${i + 1}. ${answerLine(it.text, it.answer, false)}`), '', `${v.masjidName} · ${CONFIG.APP_NAME}`, 'Penyertaan PERCUMA — jom hadir sesi seterusnya! 🤲'].join('\n');
     return `<section class="card accent" style="text-align:left">
@@ -1502,6 +1565,7 @@ const J = {
       ${v.review.items.map((it, i) => `<div class="review-item"><b>${i + 1}.</b> ${answerLine(it.text, it.answer)}
         <div class="small">${it.mine == null ? '<span class="muted">Tidak dijawab</span>' : it.correct ? `<span class="ok-text">✓ Jawapan anda betul</span>` : `<span class="bad-text">✗ Jawapan anda: ${esc(it.mine)}</span>`}</div></div>`).join('')}
       <a class="btn btn-wa btn-block" style="margin-top:14px" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(text)}">${ICON.whatsapp} Kongsi Ringkasan via WhatsApp</a>
+      <button class="btn btn-ghost btn-block" style="margin-top:8px" type="button" onclick="Ebook.download(J.__reviewV)">${ICON.book} Muat Turun E-book (PDF)</button>
     </section>`;
   },
   /**
