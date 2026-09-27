@@ -43,10 +43,22 @@ async function step(name, fn) {
     try { if (shotPage) await shotPage.screenshot({ path: path.join(OUT, 'FAIL-' + name.replace(/[^a-z0-9]+/gi, '_').slice(0, 40) + '.png'), fullPage: true }); } catch {}
   }
 }
+// CDN pilihan (qrcodejs/jspdf) dimuat via <script> di index.html; jika tidak dicapai (cth. dasar
+// rangkaian sandbox ujian ini menyekat cdnjs.cloudflare.com/cdn.jsdelivr.net), index.html sudah
+// mengendalikannya secara lembut (Ebook.ready()/typeof QRCode — lihat langkah 4g). Jangan gagalkan
+// ujian atas kegagalan rangkaian ke host luaran ini; ia bukan bug index.html/ujian.
+const OFFLINE_OK_HOSTS = ['cdnjs.cloudflare.com', 'cdn.jsdelivr.net', 'fonts.googleapis.com', 'fonts.gstatic.com'];
 function watch(page, label) {
-  page.on('console', (m) => { if (m.type() === 'error') errors.push(`[${label}] console: ${m.text()}`); });
+  page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push(`[${label}] console: ${m.text()}`); });
   page.on('pageerror', (e) => errors.push(`[${label}] pageerror: ${e.message}`));
-  page.on('response', (r) => { if (r.status() >= 400) errors.push(`[${label}] HTTP ${r.status()} ${r.url()}`); });
+  page.on('response', (r) => { if (r.status() >= 400 && !OFFLINE_OK_HOSTS.some((h) => r.url().includes(h))) errors.push(`[${label}] HTTP ${r.status()} ${r.url()}`); });
+  // net::ERR_ABORTED: permintaan sumber (cth. ikon) dibatalkan pelayar sendiri kerana navigasi/reload
+  // menyusuli serta-merta — biasa & tidak berkaitan dengan logik ujian, bukan ralat sebenar.
+  page.on('requestfailed', (req) => {
+    const u = req.url(), err = req.failure()?.errorText || '';
+    if (err === 'net::ERR_ABORTED' || OFFLINE_OK_HOSTS.some((h) => u.includes(h))) return;
+    errors.push(`[${label}] permintaan gagal: ${u} (${err})`);
+  });
   page.on('dialog', (d) => { errors.push(`[${label}] dialog pelayar tidak dijangka: ${d.message()}`); d.dismiss(); });
 }
 const screenOf = (p) => p.evaluate(() => document.querySelector('.jwrap')?.dataset.screen || null);
@@ -83,7 +95,7 @@ const db = (p) => p.evaluate(() => LocalAPI.read());
     await admin.reload(); await sleep(300);
     const a = await db(admin), b = await db(admin);
     const st = Object.fromEntries(a.sessions.map((s) => [s.id, s.state]));
-    assert(a.schemaVersion === 3, 'versi skema bukan 3');
+    assert(a.schemaVersion === 4, 'versi skema bukan 4');
     assert(st.s_lama === 'done' && st.s_hari === 'registration' && st.s_draf === 'draft', 'pemetaan keadaan salah: ' + JSON.stringify(st));
     assert(a.participants[0].secret && a.participants[0].secret === b.participants[0].secret, 'rahsia peserta tidak stabil antara bacaan');
     assert(a.registrations[0].dist === 12 && !('tokenSlot' in a.registrations[0]), 'pendaftaran tidak dimigrasi');
@@ -151,33 +163,36 @@ const db = (p) => p.evaluate(() => LocalAPI.read());
     assert(await admin.locator('.step.now').textContent() === 'Pendaftaran', 'stepper salah');
   });
 
-  /* ---------- 2. Skrin besar + 3 tab jemaah ---------- */
-  const skrin = await newPage('skrin', `${BASE}#skrin?s=${sid}`);
-  let qrUrl;
+  /* ---------- 2. Kod sertai statik (QR bercetak) + pendaftaran jemaah ---------- */
   const devUrl = (dev, url) => url.replace('index.html#', `index.html?dev=${dev}#`);
-  await step('2a. Skrin besar: login PIN, QR dinamik dipapar', async () => {
-    await skrin.fill('#pin', '1234'); await skrin.click('#pinForm button'); await sleep(800);
-    await skrin.waitForFunction(() => document.querySelector('#qrBig')?.dataset.url && document.querySelector('#qrBig img, #qrBig canvas'), null, { timeout: 4000 });
-    qrUrl = await skrin.evaluate(() => document.querySelector('#qrBig').dataset.url);
-    assert(/#j\?s=.+&t=\d+-[0-9a-f]+$/.test(qrUrl), 'URL QR salah: ' + qrUrl);
-    assert(await skrin.locator('text=Penyertaan PERCUMA').count() > 0, 'nota percuma tiada');
+  let joinCode, joinUrl;
+  await step('2a. Kod sertai statik dijana (setara gij_join_code); pautan QR bercetak', async () => {
+    joinCode = await admin.evaluate((id) => API.joinCode(id), sid);
+    assert(/^[0-9a-f]+$/.test(joinCode) && joinCode.length <= 12, 'format kod sertai salah: ' + joinCode);
+    joinUrl = `${BASE}#j?s=${sid}&t=${joinCode}`;
   });
   const J = {};
-  await step('2b. Token tamat / palsu / tiada ditolak', async () => {
-    const sec = await admin.evaluate(() => LocalAPI.read().settings.tokenSecret);
-    const oldTok = await admin.evaluate(([s, id]) => Token.make(s, id, Token.slot() - 3), [sec, sid]);
-    const E = await newPage('jemaah-E', devUrl('E', qrUrl.replace(/t=.*$/, 't=' + oldTok)));
-    await waitScreen(E, 'tokenbad'); assert(await E.locator('text=tamat tempoh').count() === 1, 'mesej tamat tempoh tiada');
-    await E.goto(devUrl('E', qrUrl.replace(/-[0-9a-f]+$/, '-deadbeef1234'))); await sleep(400);
-    await waitScreen(E, 'tokenbad'); assert(await E.locator('text=Kod QR tidak sah').count() === 1, 'token palsu tidak ditolak');
+  await step('2b. Kod tidak sah / tiada ditolak (tiada lagi tamat tempoh 60s — statik)', async () => {
+    const E = await newPage('jemaah-E', devUrl('E', joinUrl.replace(/t=.*$/, 't=deadbeefdead')));
+    await waitScreen(E, 'kodtidaksah'); assert(await E.locator('text=Kod QR tidak sah').count() === 1, 'kod palsu tidak ditolak');
     const G = await newPage('jemaah-G', `${BASE}?dev=G#j`);
+    await waitScreen(G, 'scan'); // tiada kod → minta imbas
+    await G.goto(devUrl('G', joinUrl.replace(/&t=.*$/, ''))); await sleep(400);
     await waitScreen(G, 'scan');
-    await G.goto(devUrl('G', qrUrl.replace(/&t=.*$/, ''))); await sleep(400);
-    await waitScreen(G, 'scan'); // tanpa token → minta imbas
     await E.close(); await G.close();
   });
-  await step('2c. Jemaah A: input kosong & telefon salah ditolak, daftar baharu', async () => {
-    const A = J.A = await newPage('jemaah-A', devUrl('A', qrUrl));
+  const registerDevice = async (dev, phone, name) => {
+    const P = J[dev] = await newPage('jemaah-' + dev, devUrl(dev, joinUrl));
+    await waitScreen(P, 'daftar');
+    await P.fill('#phone', phone); await P.click('#regForm button[type=submit]'); await sleep(250);
+    await P.fill('#name', name); await P.click('#regForm button[type=submit]'); await sleep(300);
+    await P.waitForSelector('#btnTeruskan', { timeout: 4000 }); // skrin poster pendaftaran (sekali sahaja)
+    await P.click('#btnTeruskan'); await sleep(200);
+    await waitScreen(P, 'tunggu_soalan');
+    return P;
+  };
+  await step('2c. Jemaah A: input kosong & telefon salah ditolak; daftar baharu; skrin poster pendaftaran', async () => {
+    const A = J.A = await newPage('jemaah-A', devUrl('A', joinUrl));
     await waitScreen(A, 'daftar');
     await A.click('#regForm button[type=submit]'); await sleep(150);
     assert(await A.locator('#fPhone .error:not(.hidden)').count() === 1, 'telefon kosong diterima');
@@ -188,32 +203,39 @@ const db = (p) => p.evaluate(() => LocalAPI.read());
     await A.fill('#phone', '+60 12-777 8888'); await A.click('#regForm button[type=submit]'); await sleep(300);
     await A.click('#regForm button[type=submit]'); await sleep(150);
     assert(await A.locator('#fName .error:not(.hidden)').count() === 1, 'nama kosong diterima');
-    await A.fill('#name', '  Ali   bin Abu '); await A.click('#regForm button[type=submit]');
+    await A.fill('#name', '  Ali   bin Abu '); await A.click('#regForm button[type=submit]'); await sleep(300);
+    await A.waitForSelector('#btnTeruskan', { timeout: 4000 });
+    assert(await A.locator('#regPoster').count() === 1, 'poster pendaftaran tidak dipapar');
+    await A.click('#btnTeruskan');
     await waitScreen(A, 'tunggu_soalan');
     const d = await db(A); assert(d.participants[0].name === 'Ali bin Abu' && d.participants[0].phone === '0127778888', 'data peserta salah');
   });
-  await step('2d. Jemaah B & C daftar; kiraan hadir AJK & skrin dikemas kini serta-merta', async () => {
-    for (const [k, phone, name] of [['B', '0139990000', 'Siti Aminah'], ['C', '0145556666', 'Haji Osman']]) {
-      const P = J[k] = await newPage('jemaah-' + k, devUrl(k, qrUrl));
-      await waitScreen(P, 'daftar');
-      await P.fill('#phone', phone); await P.click('#regForm button[type=submit]'); await sleep(250);
-      await P.fill('#name', name); await P.click('#regForm button[type=submit]');
-      await waitScreen(P, 'tunggu_soalan');
-    }
-    await admin.waitForFunction(() => document.querySelector('#lvHadir')?.textContent === '3', null, { timeout: 3000 });
-    await skrin.waitForFunction(() => /3 jemaah hadir/.test(document.querySelector('#skCount')?.textContent || ''), null, { timeout: 3000 });
+  await step('2d. Jemaah B, C, D & E daftar; kiraan hadir AJK dikemas kini serta-merta', async () => {
+    await registerDevice('B', '0139990000', 'Siti Aminah');
+    await registerDevice('C', '0145556666', 'Haji Osman');
+    await registerDevice('D', '0171112222', 'Luqman Lewat');
+    await registerDevice('E', '0181234567', 'Nurul Huda');
+    await admin.waitForFunction(() => document.querySelector('#lvHadir')?.textContent === '5', null, { timeout: 3000 });
   });
   await step('2e. Refresh jemaah semasa menunggu → skrin sama', async () => {
     await J.A.reload(); await waitScreen(J.A, 'tunggu_soalan');
     assert(await J.A.locator('text=Ali bin Abu').count() > 0, 'nama tidak dipapar');
   });
+  await step('2f. AJK "Sediakan Soalan" → jemaah papar "Soalan sedang disediakan…"; pendaftaran baharu ditutup', async () => {
+    await admin.click('[data-to="prepared"]'); await sleep(300);
+    assert((await db(admin)).sessions[0].state === 'prepared', 'tidak masuk "prepared"');
+    for (const k of ['A', 'B', 'C', 'D', 'E']) await waitScreen(J[k], 'bersedia');
+    const E = await newPage('jemaah-E2', devUrl('E2', joinUrl));
+    await waitScreen(E, 'tutup'); // sesi bukan lagi 'registration' → pendaftaran baharu ditutup
+    assert(await E.locator('text=Pendaftaran telah ditutup').count() === 1, 'pendaftaran baharu tidak ditutup semasa "prepared"');
+    await E.close();
+  });
 
-  /* ---------- 3. Buka soalan: semua tab terima serentak ---------- */
-  await step('3a. AJK Buka Soalan → 3 tab jemaah & skrin bertukar serentak (<2.5s)', async () => {
+  /* ---------- 3. Lancarkan soalan: semua tab terima serentak ---------- */
+  await step('3a. AJK Lancarkan Soalan → 5 tab jemaah bertukar serentak (<2.5s)', async () => {
     await admin.click('[data-to="questions"]'); await sleep(150); await confirmModal(admin);
     const t0 = Date.now();
-    await Promise.all(['A', 'B', 'C'].map((k) => waitScreen(J[k], 'soalan', 2500)));
-    await skrin.waitForSelector('.sq-card', { timeout: 2500 });
+    await Promise.all(['A', 'B', 'C', 'D', 'E'].map((k) => waitScreen(J[k], 'soalan', 2500)));
     console.log(`     serentak dalam ${Date.now() - t0} ms`);
   });
   const correctOf = async (p) => p.evaluate((s) => Object.fromEntries(LocalAPI.read().questions.filter((q) => q.sessionId === s && q.status === 'lulus').map((q) => [q.id, q.correctIndex])), sid);
@@ -246,100 +268,96 @@ const db = (p) => p.evaluate(() => LocalAPI.read());
     await waitScreen(J.B, 'tunggu_cabutan');
     assert((await J.B.textContent('.ticket-count')).trim() === '1', 'tiket B salah');
   });
-  await step('3e. C 2 betul; lewat D daftar semasa soalan & terus nampak soalan', async () => {
+  await step('3e. C 2 betul; D 0 betul (tiada tiket); E 1 betul', async () => {
     await answer(J.C, [true, false, true, false]);
     await waitScreen(J.C, 'tunggu_cabutan');
     assert((await J.C.textContent('.ticket-count')).trim() === '2', 'tiket C salah');
-    const url = await skrin.evaluate(() => document.querySelector('#qrSmall').dataset.url);
-    const D = J.D = await newPage('jemaah-D', devUrl('D', url));
-    await waitScreen(D, 'daftar');
-    await D.fill('#phone', '0171112222'); await D.click('#regForm button[type=submit]'); await sleep(250);
-    await D.fill('#name', 'Luqman Lewat'); await D.click('#regForm button[type=submit]');
-    await waitScreen(D, 'soalan');
+    await answer(J.D, [false, false, false, false]);
+    await waitScreen(J.D, 'tunggu_cabutan');
+    assert((await J.D.textContent('.ticket-count')).trim() === '0', 'tiket D sepatutnya 0');
+    await answer(J.E, [false, true, false, false]);
+    await waitScreen(J.E, 'tunggu_cabutan');
+    assert((await J.E.textContent('.ticket-count')).trim() === '1', 'tiket E salah');
   });
   await step('3f. Jawab dua kali ditolak; refresh selepas jawab → skrin sama', async () => {
     const r = await J.A.evaluate((s) => { const me = LS.get(K.me); return LocalAPI.submit({ sid: s, pid: me.participantId, secret: me.secret, answers: {} }); }, sid);
     assert(r.reason === 'duplicate', 'jawapan kedua diterima: ' + JSON.stringify(r));
     await J.C.reload(); await waitScreen(J.C, 'tunggu_cabutan');
   });
-  await step('3g. AJK Tutup Soalan → D terus ke Menunggu cabutan (0 tiket); jawab selepas tutup ditolak', async () => {
-    await admin.click('[data-to="closed"]');
-    await waitScreen(J.D, 'tunggu_cabutan', 2500);
-    assert((await J.D.textContent('.ticket-count')).trim() === '0', 'D sepatutnya 0 tiket');
-    const r = await J.D.evaluate((s) => { const me = LS.get(K.me); const q = LocalAPI.read().questions.find((x) => x.sessionId === s); return LocalAPI.submit({ sid: s, pid: me.participantId, secret: me.secret, answers: { [q.id]: q.correctIndex } }); }, sid);
-    assert(r.reason === 'closed', 'jawapan selepas tutup diterima');
-    await skrin.waitForFunction(() => /Soalan telah ditutup/.test(document.body.textContent), null, { timeout: 2500 });
+  await step('3g. AJK Tutup Soalan → semua tab kekal di Menunggu cabutan', async () => {
+    await admin.click('[data-to="closed"]'); await sleep(300);
+    assert((await db(admin)).sessions[0].state === 'closed', 'tidak masuk "closed"');
+    for (const k of ['A', 'B', 'C', 'D', 'E']) await waitScreen(J[k], 'tunggu_cabutan');
   });
 
-  /* ---------- 4. Roda cabutan ---------- */
+  /* ---------- 4. Cabutan — pemenang ditentukan DI PELAYAN; setiap telefon papar animasi
+     ringkas sendiri (BUKAN roda besar disegerakkan, yang telah dibuang bersama #skrin). ---------- */
   const tabOf = async (pid) => { for (const k of Object.keys(J)) { const me = await J[k].evaluate(() => LS.get(K.me)); if (me?.participantId === pid) return k; } return null; };
-  const winnersDB = async () => (await db(admin)).winners.filter((w) => w.sessionId === sid).sort((a, b) => a.order - b.order);
-  async function spinOnce(how) {
-    await skrin.waitForFunction(() => { const b = document.querySelector('#btnSpin'); return b && !b.disabled; }, null, { timeout: 12000 });
-    if (how === 'space') { await skrin.evaluate(() => document.activeElement?.blur()); await skrin.keyboard.press('Space'); }
-    else await skrin.click('#btnSpin');
-    await sleep(900);
-    const ws = await winnersDB(), w = ws[ws.length - 1];
-    const k = await tabOf(w.participantId);
-    assert(await screenOf(J[k]) !== 'tahniah', 'keputusan bocor ke telefon sebelum roda berhenti');
-    await skrin.waitForFunction(() => document.querySelector('.win-overlay'), null, { timeout: 10000 });
-    const landed = await skrin.evaluate(() => document.querySelector('#wheel').dataset.landed);
-    const shown = await skrin.textContent('#winName');
-    assert(landed === w.participantId, `roda berhenti pada ${landed} tetapi DB pemenang ${w.participantId}`);
-    const name = (await db(admin)).participants.find((p) => p.id === w.participantId).name;
-    assert(shown.trim() === name, `nama di tengah roda (${shown}) ≠ pemenang (${name})`);
-    await waitScreen(J[k], 'tahniah', 3000);
-    return { w, k };
-  }
-  await step('4a. Mulakan Cabutan → skrin papar roda dengan nama peserta layak', async () => {
-    await admin.click('[data-to="drawing"]');
-    await skrin.waitForSelector('#wheel', { timeout: 3000 });
-    const segs = await skrin.evaluate(() => Skrin.segs.map((x) => x.name).sort().join(','));
-    assert(segs === ['Ali bin Abu', 'Haji Osman', 'Siti Aminah'].sort().join(','), 'segmen roda salah: ' + segs);
-    await skrin.screenshot({ path: path.join(OUT, 'roda-sebelum.png') });
+  await step('4a. Mulakan Cabutan; kurangkan hadiah kepada 2 (daripada 4 tiket-pemegang) supaya ada "belum rezeki"', async () => {
+    // Nota ujian: perlahankan animasi cabutan dipendekkan (bukan schema.sql) untuk ujian pantas — tidak mengubah index.html.
+    await admin.evaluate((id) => API.write([{ t: 'sessions', op: 'upsert', row: { id, prizes: ['Sejadah Premium', 'Al-Quran Terjemahan'] } }]), sid);
+    await admin.evaluate(() => { CONFIG.SPIN_MIN_MS = 300; CONFIG.SPIN_MAX_MS = 500; });
+    await admin.click('[data-to="drawing"]'); await sleep(300);
+    assert((await db(admin)).sessions[0].state === 'drawing', 'tidak masuk "drawing"');
   });
   const wins = [];
-  await step('4b. Putaran 1 (butang): roda = DB, keputusan terus ke telefon pemenang', async () => { wins.push(await spinOnce('click')); });
-  await step('4c. Putaran 2 (Space): pemenang dikeluarkan dari roda, tiada berganda', async () => {
-    const segs = await skrin.evaluate(() => Skrin.segs.map((x) => x.id));
-    assert(!segs.includes(wins[0].w.participantId), 'pemenang 1 masih di roda');
-    wins.push(await spinOnce('space'));
-  });
-  await step('4d. Putaran 3; tiket kurang dari hadiah → mesej & butang dimatikan', async () => {
-    wins.push(await spinOnce('click'));
-    await skrin.screenshot({ path: path.join(OUT, 'roda-pemenang.png') });
-    const ids = wins.map((x) => x.w.participantId);
-    assert(new Set(ids).size === 3, 'pemenang berganda');
-    await skrin.waitForFunction(() => /Tiada lagi peserta layak — 1 hadiah/.test(document.querySelector('#drawMsg')?.textContent || ''), null, { timeout: 3000 });
-    assert(await skrin.locator('#btnSpin').isDisabled(), 'butang putar masih aktif');
+  await step('4b. Cabutan pertama: keputusan TIDAK terus ke telefon pemenang; muncul selepas animasi ringkas', async () => {
     const r = await admin.evaluate((s) => LocalAPI.draw(s), sid);
-    assert(r.reason === 'nopool', 'cabutan tambahan dibenarkan');
+    assert(r.ok, 'cabutan pertama gagal: ' + JSON.stringify(r));
+    const k = await tabOf(r.winner.participantId);
+    assert((await screenOf(J[k])) !== 'tahniah', 'keputusan bocor ke telefon sebelum animasi tamat');
+    await waitScreen(J[k], 'tahniah', 4000);
+    wins.push({ k, w: r.winner });
   });
-  await step('4e. Tamatkan sesi → D "Belum rezeki"; pemenang papar poster + ringkasan', async () => {
-    await skrin.click('#btnFinish');
-    await waitScreen(J.D, 'belum', 3000);
-    assert(await J.D.locator('text=Belum rezeki').count() === 1 && await J.D.locator('.points li').count() >= 3, 'belum rezeki / ringkasan tiada');
+  await step('4c. Cabutan kedua: pemenang berbeza, tiada berganda', async () => {
+    const r = await admin.evaluate((s) => LocalAPI.draw(s), sid);
+    assert(r.ok, 'cabutan kedua gagal: ' + JSON.stringify(r));
+    assert(r.winner.participantId !== wins[0].w.participantId, 'pemenang sama dicabut dua kali');
+    const k = await tabOf(r.winner.participantId);
+    await waitScreen(J[k], 'tahniah', 4000);
+    wins.push({ k, w: r.winner });
+  });
+  await step('4d. Hadiah dihabiskan → cabutan seterusnya "noprize" (tiket masih ada, hanya hadiah tiada)', async () => {
+    const r = await admin.evaluate((s) => LocalAPI.draw(s), sid);
+    assert(r.reason === 'noprize', 'cabutan tambahan selepas hadiah habis dibenarkan: ' + JSON.stringify(r));
+  });
+  await step('4e. Tamatkan sesi → D "Terima kasih kerana hadir" (0 tiket); baki pemegang tiket "Belum rezeki"; pemenang papar poster + ringkasan', async () => {
+    await admin.click('[data-to="done"]'); await sleep(300);
+    await waitScreen(J.D, 'belum_tiada', 3000);
+    assert(await J.D.locator('text=Terima kasih kerana hadir').count() === 1, 'skrin tiada tiket salah');
     for (const { k, w } of wins) {
       await waitScreen(J[k], 'tahniah');
       await J[k].waitForSelector('#winPoster', { timeout: 4000 });
       assert(await J[k].locator(`text=${w.prize}`).count() > 0, 'hadiah tidak dipapar');
-      await J[k].waitForFunction(() => document.querySelectorAll('.points li').length >= 3, null, { timeout: 3000 });
+    }
+    const loserKeys = ['A', 'B', 'C', 'E'].filter((k) => !wins.some((x) => x.k === k));
+    assert(loserKeys.length === 2, 'sepatutnya 2 pemegang tiket tidak menang: ' + loserKeys.join(','));
+    for (const k of loserKeys) {
+      await waitScreen(J[k], 'belum_ada');
+      assert(await J[k].locator('text=Belum rezeki').count() === 1, 'skrin ada tiket tapi tidak menang salah');
     }
     const href = await J.D.locator('a.btn-wa').getAttribute('href');
     const txt = decodeURIComponent(href.split('text=')[1]);
     assert(href.startsWith('https://wa.me/?text=') && txt.includes('Ringkasan Ilmu') && txt.includes('Jawapan betul'), 'pautan WA ringkasan salah');
-    await sleep(700); await J[wins[0].k].screenshot({ path: path.join(OUT, 'jemaah-tahniah.png'), fullPage: true });
-    await J.D.screenshot({ path: path.join(OUT, 'jemaah-belum-rezeki.png'), fullPage: true });
+    await sleep(500); await J[wins[0].k].screenshot({ path: path.join(OUT, 'jemaah-tahniah.png'), fullPage: true });
+    await J.D.screenshot({ path: path.join(OUT, 'jemaah-belum-tiada.png'), fullPage: true });
   });
   await step('4f. Refresh pemenang & bukan pemenang selepas selesai → skrin betul', async () => {
     await J[wins[0].k].reload(); await waitScreen(J[wins[0].k], 'tahniah');
-    await J.D.reload(); await waitScreen(J.D, 'belum');
+    await J.D.reload(); await waitScreen(J.D, 'belum_tiada');
   });
-  await step('4g. Roda maksimum 40 nama & termasuk pemenang', async () => {
+  await step('4g. Muat Turun E-book (PDF): butang wujud pada skrin ringkasan & boleh diklik tanpa ralat', async () => {
+    for (const p of [J[wins[0].k], J.D]) {
+      const btn = p.locator('button:has-text("Muat Turun E-book")');
+      assert(await btn.count() === 1, 'butang e-book tiada pada skrin ringkasan');
+      await btn.click(); await sleep(300); // jspdf CDN mungkin tidak dimuat dlm sandbox ujian → Ebook.ready() toast ralat lembut, bukan lontar ralat
+    }
+  });
+  await step('4h. Roda cabutan terhad kepada 40 nama & termasuk pemenang (had dikekalkan walaupun UI roda besar dibuang)', async () => {
     const r = await admin.evaluate(() => {
       const d = LocalAPI.read();
-      const s = { id: 's_besar', templateId: null, title: 'Besar', speaker: '', date: ymd(new Date()), startTime: '00:00', endTime: '23:59', answerMinutes: 5, prizes: ['A'], transcript: '', summary: [], state: 'drawing', rev: 0 };
-      const q = { id: 'q_besar', sessionId: 's_besar', text: 'Q', options: ['a', 'b', 'c', 'd'], correctIndex: 0, status: 'lulus' };
+      const s = { id: 's_besar', templateId: null, title: 'Besar', speaker: '', date: ymd(new Date()), startTime: '00:00', endTime: '23:59', answerMinutes: 5, prizes: ['A'], transcript: '', summary: [], prizeInstructions: '', state: 'drawing', rev: 0 };
+      const q = { id: 'q_besar', sessionId: 's_besar', text: 'Q', options: ['a', 'b', 'c', 'd'], correctIndex: 0, difficulty: 'sederhana', status: 'lulus' };
       d.sessions.push(s); d.questions.push(q);
       for (let i = 0; i < 55; i++) { const p = { id: 'pb' + i, name: 'Peserta ' + i, phone: '019' + String(1000000 + i), secret: 'x' }; d.participants.push(p); d.registrations.push({ id: 'rb' + i, sessionId: 's_besar', participantId: p.id, regNo: i + 1 }); d.answers.push({ id: 'ab' + i, sessionId: 's_besar', participantId: p.id, questionId: 'q_besar', choiceIndex: 0, isCorrect: true }); }
       LocalAPI.persist(d);
@@ -360,12 +378,14 @@ const db = (p) => p.evaluate(() => LocalAPI.read());
     await admin.goto(BASE + '#admin?tab=langsung'); await sleep(300);
     await admin.selectOption('#liveSel', sid2); await sleep(200);
     await admin.click('[data-to="registration"]'); await sleep(400);
-    const tok = await admin.evaluate((s) => LocalAPI.token(s), sid2);
-    const url = `${BASE}#j?s=${sid2}&t=${tok}`;
+    const code2 = await admin.evaluate((s) => API.joinCode(s), sid2);
+    const url = `${BASE}#j?s=${sid2}&t=${code2}`;
     await J.C.goto(devUrl('C', url)); await sleep(300);
     await waitScreen(J.C, 'daftar');
     assert(await J.C.locator('text=Selamat kembali').count() === 1 && await J.C.locator('#phone').count() === 0, 'peranti C tidak dikenali');
-    await J.C.click('#btnHadir'); await waitScreen(J.C, 'tunggu_soalan');
+    await J.C.click('#btnHadir'); await sleep(300);
+    await J.C.waitForSelector('#btnTeruskan', { timeout: 4000 }); await J.C.click('#btnTeruskan');
+    await waitScreen(J.C, 'tunggu_soalan');
     assert(await J.C.locator('text=2 sesi berturut-turut').count() === 1, 'streak C tidak dipapar');
     const F = J.F = await newPage('jemaah-F', devUrl('F', url));
     await waitScreen(F, 'daftar');
@@ -375,7 +395,8 @@ const db = (p) => p.evaluate(() => LocalAPI.read());
     assert(await F.locator('#confName').count() === 1 && !/Ali|bin|Abu/.test(txt.replace(/Taip nama|bin\/binti/g, '')) && txt.includes('A***'), 'nama penuh terdedah / tiada pengesahan: ' + txt.slice(0, 120));
     await F.fill('#confName', 'Orang Lain'); await F.click('#regForm button[type=submit]'); await sleep(400);
     assert(await F.locator('#fConf .error:not(.hidden)').count() === 1 && await screenOf(F) === 'daftar', 'nama salah diterima');
-    await F.fill('#confName', 'ali  BIN abu'); await F.click('#regForm button[type=submit]');
+    await F.fill('#confName', 'ali  BIN abu'); await F.click('#regForm button[type=submit]'); await sleep(300);
+    await F.waitForSelector('#btnTeruskan', { timeout: 4000 }); await F.click('#btnTeruskan');
     await waitScreen(F, 'tunggu_soalan');
     assert(new Date((await db(admin)).sessions.find((s) => s.id === sid2).date) > new Date((await db(admin)).sessions.find((s) => s.id === sid).date), 'sesi ke-2 templat tidak dijadualkan selepas sesi pertama');
     const d = await db(admin), ali = d.participants.find((p) => p.phone === '0127778888');
@@ -398,12 +419,9 @@ const db = (p) => p.evaluate(() => LocalAPI.read());
     assert(r.stats.current === 1 && r.stats.best === 3, 'stats ' + JSON.stringify(r.stats));
     assert(!r.keys.some((k) => /streak/i.test(k)), 'jadual streak berasingan wujud');
   });
-  await step('5c. Sesi tanpa peserta: roda kosong, tiada cabutan', async () => {
-    await admin.evaluate(() => { const d = LocalAPI.read(); d.sessions.push({ id: 's_kosong', templateId: null, title: 'Sesi Kosong', speaker: '', date: ymd(new Date()), startTime: '08:00', endTime: '09:00', answerMinutes: 5, prizes: ['A'], transcript: '', summary: [], state: 'drawing', rev: 0 }); LocalAPI.persist(d); Bus.notify(); });
-    await skrin.goto(`${BASE}#skrin?s=s_kosong`); await sleep(600);
-    assert(await skrin.locator('#btnSpin').isDisabled(), 'butang aktif walaupun tiada peserta');
-    assert(/Tiada peserta layak/.test(await skrin.textContent('#drawMsg')), 'mesej tiada peserta tiada');
-    assert((await admin.evaluate(() => LocalAPI.draw('s_kosong'))).reason === 'nopool', 'cabutan dibenarkan');
+  await step('5c. Sesi tanpa peserta: tiada tiket, tiada cabutan', async () => {
+    await admin.evaluate(() => { const d = LocalAPI.read(); d.sessions.push({ id: 's_kosong', templateId: null, title: 'Sesi Kosong', speaker: '', date: ymd(new Date()), startTime: '08:00', endTime: '09:00', answerMinutes: 5, prizes: ['A'], transcript: '', summary: [], prizeInstructions: '', state: 'drawing', rev: 0 }); LocalAPI.persist(d); Bus.notify(); });
+    assert((await admin.evaluate(() => LocalAPI.draw('s_kosong'))).reason === 'nopool', 'cabutan dibenarkan walaupun tiada peserta');
   });
 
   /* ---------- 6. Ranking, laporan, CSV, WhatsApp, tetapan, PWA ---------- */
@@ -495,20 +513,21 @@ const db = (p) => p.evaluate(() => LocalAPI.read());
         if (m.res.text < 7 || m.res.muted < 4.5 || m.res.mutedBg < 4.5 || m.res.primary < 4.5) issues.push(`${label2}: kontras ${JSON.stringify(m.res)}`);
         await sleep(500); await V.screenshot({ path: path.join(OUT, `${label}-${theme}-${label2}.png`), fullPage: !label2.startsWith('skrin') });
       };
-      const tok = await V.evaluate((s) => LocalAPI.token(s), live);
+      const code = await V.evaluate((s) => API.joinCode(s), live);
       await check('j-scan', `${BASE}?dev=V1${label}${theme}#j`);
-      await check('j-daftar', `${BASE}?dev=V2${label}${theme}#j?s=${live}&t=${tok}`, async () => { await V.fill('#phone', '0199998888'); await V.click('#regForm button[type=submit]'); await sleep(300); });
-      await check('j-menunggu', `${BASE}?dev=V3${label}${theme}#j?s=${live}&t=${tok}`, async () => { await V.fill('#phone', '01999' + String(vw).padStart(4, '0') + (theme === 'dark' ? '1' : '2')); await V.click('#regForm button[type=submit]'); await sleep(250); await V.fill('#name', 'Ujian Visual'); await V.click('#regForm button[type=submit]'); await sleep(500); });
+      await check('j-kodtidaksah', `${BASE}?dev=V0${label}${theme}#j?s=${live}&t=deadbeefdead`);
+      await check('j-daftar', `${BASE}?dev=V2${label}${theme}#j?s=${live}&t=${code}`, async () => { await V.fill('#phone', '0199998888'); await V.click('#regForm button[type=submit]'); await sleep(300); });
+      await check('j-poster', `${BASE}?dev=V3${label}${theme}#j?s=${live}&t=${code}`, async () => { await V.fill('#phone', '01999' + String(vw).padStart(4, '0') + (theme === 'dark' ? '1' : '2')); await V.click('#regForm button[type=submit]'); await sleep(250); await V.fill('#name', 'Ujian Visual'); await V.click('#regForm button[type=submit]'); await sleep(500); await V.waitForSelector('#btnTeruskan', { timeout: 4000 }).catch(() => {}); });
+      if (await V.locator('#btnTeruskan').count()) { await V.click('#btnTeruskan'); await sleep(300); }
+      await check('j-menunggu', `${BASE}?dev=V3${label}${theme}#j`);
       for (const t of ['langsung', 'sesi', 'templat', 'ranking', 'laporan', 'tetapan']) await check('admin-' + t, `${BASE}#admin?tab=${t}`);
-      await check('skrin-qr', `${BASE}#skrin?s=${live}`);
-      const past = await V.evaluate(() => LocalAPI.read().sessions.find((s) => s.state === 'done').id);
-      await check('skrin-selesai', `${BASE}#skrin?s=${past}`);
       assert(!issues.length, issues.join('\n'));
     });
   }
   await step('7b. Skrin jemaah (soalan / menunggu cabutan / tahniah / belum rezeki) pada 375px', async () => {
     await V.setViewportSize({ width: 375, height: 812 });
     const shots = [['j-soalan', 'soalan'], ['j-tunggu-cabutan', 'tunggu_cabutan']];
+    await V.evaluate((s) => LocalAPI.setState(s, 'prepared'), live);
     await V.evaluate((s) => LocalAPI.setState(s, 'questions'), live);
     await V.goto(`${BASE}?dev=V3mobilelight#j`); await V.reload(); await waitScreen(V, 'soalan');
     await sleep(700); await V.screenshot({ path: path.join(OUT, 'mobile-j-soalan.png'), fullPage: true });

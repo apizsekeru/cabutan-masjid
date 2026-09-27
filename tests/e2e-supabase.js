@@ -2,8 +2,9 @@
    Ujian end-to-end MOD SUPABASE — projek Supabase SEBENAR
    Jalankan:  cd tests && MODE=supabase GIJ_PIN=1234 node e2e.js
               (BASE_URL=https://laman-anda.netlify.app untuk uji laman yang dihos)
-   - Setiap peranti (AJK, skrin, jemaah A–F) = KONTEKS pelayar berasingan
-     (storan tidak dikongsi) → semua isyarat melalui Supabase Realtime.
+   - Setiap peranti (AJK, jemaah A–F) = KONTEKS pelayar berasingan (storan tidak
+     dikongsi) → semua isyarat melalui Supabase Realtime. v5: tiada lagi skrin besar —
+     kod sertai QR statik (gij_join_code) & cabutan (gij_draw) dipanggil terus.
    - Semua data ujian ditanda "[UJIAN E2E]" / telefon 019900xxxx dan
      DIPADAM sebelum & selepas larian (sesi, templat, peserta).
    - Tetapan streak dipulihkan selepas ujian.
@@ -43,7 +44,8 @@ async function rpc(fn, args) { const r = await rest('rpc/' + fn, { method: 'POST
 const snap = () => rpc('gij_admin_snapshot', { p_pin: PIN });
 const write = (ops) => rpc('gij_admin_write', { p_pin: PIN, p_ops: ops });
 const setState = (sid, st) => rpc('gij_set_state', { p_pin: PIN, p_sid: sid, p_state: st });
-const token = (sid) => rpc('gij_token', { p_pin: PIN, p_sid: sid });
+// v5: kod sertai STATIK (gantikan gij_token dinamik 60s) — sah selagi sesi 'registration', tiada TTL.
+const joinCode = (sid) => rpc('gij_join_code', { p_pin: PIN, p_sid: sid });
 const serverNow = async () => (await rpc('gij_jemaah_view', { p_sid: '', p_pid: '', p_secret: '' })).now;
 
 async function cleanup() {
@@ -98,7 +100,7 @@ const meOf = (p) => p.evaluate(() => JSON.parse(localStorage.getItem('gij_me') |
   if (before.sessions || before.participants) console.log(`     (dibersihkan sisa larian lepas: ${JSON.stringify(before)})`);
   const settings0 = (await snap()).settings;
   const TEXT = /DEMO_TEXTS = \[\s*`([^`]+)`/.exec(html)[1];
-  let sid, earlyToken;
+  let sid;
 
   /* ---------- N. Laman boleh dibuka awam (tanpa kata laluan / log masuk Netlify) ---------- */
   await step('N. Laman dibuka dalam konteks pelayar baharu tanpa kata laluan', async () => {
@@ -130,11 +132,15 @@ const meOf = (p) => p.evaluate(() => JSON.parse(localStorage.getItem('gij_me') |
     assert(!del.ok || (Array.isArray(del.body) && del.body.length === 0), 'anon boleh DELETE sessions');
   });
   await step('R3. Fungsi dalaman (gij__*) tidak boleh dipanggil; RPC AJK perlu PIN', async () => {
-    for (const fn of ['gij__sign', 'gij__tickets', 'gij__pin_ok']) {
-      const r = await rest('rpc/' + fn, { method: 'POST', body: JSON.stringify(fn === 'gij__sign' ? { p_msg: 'x' } : fn === 'gij__tickets' ? { p_sid: 'x' } : { p_pin: '1' }) });
+    for (const fn of ['gij__sign', 'gij__tickets', 'gij__pin_ok', 'gij__join_ok']) {
+      const r = await rest('rpc/' + fn, { method: 'POST', body: JSON.stringify(fn === 'gij__sign' ? { p_msg: 'x' } : fn === 'gij__tickets' ? { p_sid: 'x' } : fn === 'gij__join_ok' ? { p_sid: 'x', p_code: 'x' } : { p_pin: '1' }) });
       assert(!r.ok, `${fn} boleh dipanggil oleh anon`);
     }
-    for (const [fn, args] of [['gij_admin_snapshot', { p_pin: '0000' }], ['gij_token', { p_pin: '0000', p_sid: 'x' }], ['gij_admin_write', { p_pin: '0000', p_ops: [] }], ['gij_draw', { p_pin: '0000', p_sid: 'x' }]]) {
+    for (const fn of ['gij_token', 'gij_checkin']) { // v5: dibuang (gantikan skrin besar/token dinamik)
+      const r = await rest('rpc/' + fn, { method: 'POST', body: JSON.stringify({}) });
+      assert(!r.ok, `${fn} masih wujud di Supabase — schema.sql terkini belum diguna pakai (drop function)`);
+    }
+    for (const [fn, args] of [['gij_admin_snapshot', { p_pin: '0000' }], ['gij_join_code', { p_pin: '0000', p_sid: 'x' }], ['gij_admin_write', { p_pin: '0000', p_ops: [] }], ['gij_draw', { p_pin: '0000', p_sid: 'x' }]]) {
       const r = await rest('rpc/' + fn, { method: 'POST', body: JSON.stringify(args) });
       assert(!r.ok, `${fn} diterima dengan PIN salah`);
     }
@@ -187,27 +193,35 @@ const meOf = (p) => p.evaluate(() => JSON.parse(localStorage.getItem('gij_me') |
     assert(await admin.locator('[data-to="questions"]').isDisabled(), 'Buka Soalan tidak disekat');
     await admin.click('[data-to="registration"]'); await sleep(1500);
     assert((await snap()).sessions.find((x) => x.id === sid).state === 'registration', 'pendaftaran tidak dibuka');
-    earlyToken = await token(sid); // untuk ujian token tamat tempoh kemudian (>75s)
   });
 
-  /* ---------- 2. Skrin besar & jemaah (konteks berasingan) ---------- */
-  const skrin = await device('skrin', `${BASE}#skrin?s=${sid}`, { width: 1280, height: 800 });
-  let qrUrl;
-  await step('2a. Skrin besar: QR dinamik daripada gij_token', async () => {
-    await skrin.fill('#pin', PIN); await skrin.click('#pinForm button');
-    await skrin.waitForFunction(() => document.querySelector('#qrBig')?.dataset.url, null, { timeout: 10000 });
-    qrUrl = await skrin.evaluate(() => document.querySelector('#qrBig').dataset.url);
-    assert(/#j\?s=.+&t=\d+-[0-9a-f]{16}$/.test(qrUrl), 'URL QR: ' + qrUrl);
+  /* ---------- 2. Kod sertai statik (QR bercetak) & jemaah (konteks berasingan) ---------- */
+  let joinUrl;
+  await step('2a. Kod sertai statik daripada gij_join_code (bukan lagi skrin besar/token 60s)', async () => {
+    const code = await joinCode(sid);
+    assert(/^[0-9a-f]{16}$/.test(code), 'kod sertai: ' + code);
+    joinUrl = `${BASE}#j?s=${sid}&t=${code}`;
   });
   const J = {};
-  await step('2b. Token palsu ditolak oleh pelayan; tanpa token → imbas', async () => {
-    const E = await device('jemaah-E', qrUrl.replace(/-[0-9a-f]{16}$/, '-deadbeefdeadbeef'));
-    await waitScreen(E, 'tokenbad'); assert(await E.locator('text=Kod QR tidak sah').count() === 1, 'mesej tidak sah tiada');
-    await E.goto(qrUrl.replace(/&t=.*$/, '')); await sleep(1500); await waitScreen(E, 'scan');
+  await step('2b. Kod tidak sah ditolak oleh pelayan; tanpa kod → imbas', async () => {
+    const E = await device('jemaah-E', joinUrl.replace(/t=.*$/, 't=deadbeefdead'));
+    await waitScreen(E, 'kodtidaksah'); assert(await E.locator('text=Kod QR tidak sah').count() === 1, 'mesej tidak sah tiada');
+    await E.goto(joinUrl.replace(/&t=.*$/, '')); await sleep(1500); await waitScreen(E, 'scan');
     await E.context().close();
   });
-  await step('2c. Jemaah A (telefon 1): validasi & daftar baharu', async () => {
-    const A = J.A = await device('jemaah-A', qrUrl);
+  const registerDevice = async (label, phone, name) => {
+    const P = J[label] = await device('jemaah-' + label, joinUrl);
+    await waitScreen(P, 'daftar');
+    await P.fill('#phone', phone); await P.click('#regForm button[type=submit]');
+    await P.waitForSelector('#name', { timeout: 8000 });
+    await P.fill('#name', name); await P.click('#regForm button[type=submit]'); await sleep(500);
+    await P.waitForSelector('#btnTeruskan', { timeout: 8000 }); // skrin poster pendaftaran (sekali sahaja)
+    await P.click('#btnTeruskan');
+    await waitScreen(P, 'tunggu_soalan');
+    return P;
+  };
+  await step('2c. Jemaah A (telefon 1): validasi & daftar baharu; skrin poster pendaftaran', async () => {
+    const A = J.A = await device('jemaah-A', joinUrl);
     await waitScreen(A, 'daftar');
     await A.click('#regForm button[type=submit]'); await sleep(200);
     assert(await A.locator('#fPhone .error:not(.hidden)').count() === 1, 'telefon kosong diterima');
@@ -217,32 +231,36 @@ const meOf = (p) => p.evaluate(() => JSON.parse(localStorage.getItem('gij_me') |
     await A.waitForSelector('#name', { timeout: 8000 });
     await A.click('#regForm button[type=submit]'); await sleep(200);
     assert(await A.locator('#fName .error:not(.hidden)').count() === 1, 'nama kosong diterima');
-    await A.fill('#name', 'Ahmad Hafiz bin Ujian'); await A.click('#regForm button[type=submit]');
+    await A.fill('#name', 'Ahmad Hafiz bin Ujian'); await A.click('#regForm button[type=submit]'); await sleep(500);
+    await A.waitForSelector('#btnTeruskan', { timeout: 8000 });
+    assert(await A.locator('#regPoster').count() === 1, 'poster pendaftaran tidak dipapar');
+    await A.click('#btnTeruskan');
     await waitScreen(A, 'tunggu_soalan');
   });
-  await step('2d. Jemaah B & C daftar; kiraan AJK & skrin dikemas kini melalui Realtime', async () => {
-    for (const [k, n, name] of [['B', 2, 'Siti Ujian binti Test'], ['C', 3, 'Haji Osman Ujian']]) {
-      const P = J[k] = await device('jemaah-' + k, qrUrl);
-      await waitScreen(P, 'daftar');
-      await P.fill('#phone', PHONE(n)); await P.click('#regForm button[type=submit]');
-      await P.waitForSelector('#name', { timeout: 8000 });
-      await P.fill('#name', name); await P.click('#regForm button[type=submit]');
-      await waitScreen(P, 'tunggu_soalan');
-    }
-    await admin.waitForFunction(() => document.querySelector('#lvHadir')?.textContent === '3', null, { timeout: 10000 });
-    await skrin.waitForFunction(() => /3 jemaah hadir/.test(document.querySelector('#skCount')?.textContent || ''), null, { timeout: 10000 });
+  await step('2d. Jemaah B, C & D daftar; kiraan AJK dikemas kini melalui Realtime', async () => {
+    await registerDevice('B', PHONE(2), 'Siti Ujian binti Test');
+    await registerDevice('C', PHONE(3), 'Haji Osman Ujian');
+    await registerDevice('D', PHONE(4), 'Luqman Lewat'); // v5: mesti daftar semasa "registration" (bukan lagi lewat semasa "questions")
+    await admin.waitForFunction(() => document.querySelector('#lvHadir')?.textContent === '4', null, { timeout: 10000 });
   });
   await step('2e. Refresh jemaah → skrin sama (data dari pelayan)', async () => {
     await J.A.reload(); await waitScreen(J.A, 'tunggu_soalan');
   });
+  await step('2f. AJK "Sediakan Soalan" → jemaah papar "bersedia"; pendaftaran baharu ditutup', async () => {
+    await admin.click('[data-to="prepared"]'); await sleep(1000);
+    assert((await snap()).sessions.find((x) => x.id === sid).state === 'prepared', 'tidak masuk "prepared"');
+    for (const k of ['A', 'B', 'C', 'D']) await waitScreen(J[k], 'bersedia', 10000);
+    const code = await joinCode(sid);
+    const rReg = await rpc('gij_register', { p_sid: sid, p_ticket: code, p_name: 'Sesiapa', p_phone: PHONE(5), p_dist: null, p_secret: null });
+    assert(rReg.reason === 'closed', 'pendaftaran baharu masih dibenarkan semasa "prepared"');
+  });
 
   /* ---------- 3. Soalan ---------- */
-  await step('3a. AJK Buka Soalan → A, B, C & skrin bertukar melalui Realtime', async () => {
+  await step('3a. AJK Lancarkan Soalan → A, B, C, D bertukar melalui Realtime', async () => {
     await admin.click('[data-to="questions"]'); await sleep(300); await confirmModal(admin);
     const t0 = Date.now();
-    await Promise.all(['A', 'B', 'C'].map((k) => waitScreen(J[k], 'soalan', 10000)));
+    await Promise.all(['A', 'B', 'C', 'D'].map((k) => waitScreen(J[k], 'soalan', 10000)));
     const ms = Date.now() - t0;
-    await skrin.waitForSelector('.sq-card', { timeout: 10000 });
     console.log(`     Realtime: semua tab jemaah bertukar dalam ${ms} ms`);
     assert(ms < 6000, 'Realtime terlalu perlahan: ' + ms + ' ms');
   });
@@ -282,70 +300,65 @@ const meOf = (p) => p.evaluate(() => JSON.parse(localStorage.getItem('gij_me') |
     await answer(J.B, [false, false, false]); await waitScreen(J.B, 'tunggu_cabutan');
     assert((await J.B.textContent('.ticket-count')).trim() === '1', 'tiket B salah');
   });
-  await step('3e. C 2 betul; D lewat daftar semasa soalan', async () => {
+  await step('3e. C 2 betul; D 0 betul (0 tiket)', async () => {
     await answer(J.C, [true, false, true, false]); await waitScreen(J.C, 'tunggu_cabutan');
     assert((await J.C.textContent('.ticket-count')).trim() === '2', 'tiket C salah');
-    const url = await skrin.evaluate(() => document.querySelector('#qrSmall').dataset.url);
-    const D = J.D = await device('jemaah-D', url);
-    await waitScreen(D, 'daftar'); await D.fill('#phone', PHONE(4)); await D.click('#regForm button[type=submit]');
-    await D.waitForSelector('#name', { timeout: 8000 }); await D.fill('#name', 'Luqman Lewat'); await D.click('#regForm button[type=submit]');
-    await waitScreen(D, 'soalan');
+    await answer(J.D, [false, false, false, false]); await waitScreen(J.D, 'tunggu_cabutan');
+    assert((await J.D.textContent('.ticket-count')).trim() === '0', 'tiket D sepatutnya 0');
   });
   await step('3f. Jawab dua kali & rahsia salah ditolak oleh pelayan', async () => {
     const me = await meOf(J.A);
     assert((await rpc('gij_submit', { p_sid: sid, p_pid: me.participantId, p_secret: me.secret, p_answers: {} })).reason === 'duplicate', 'jawapan kedua diterima');
     assert((await rpc('gij_submit', { p_sid: sid, p_pid: me.participantId, p_secret: 'salah', p_answers: {} })).reason === 'unverified', 'rahsia salah diterima');
   });
-  await step('3g. Tutup Soalan → D ke Menunggu cabutan (0 tiket); jawab selepas tutup ditolak', async () => {
-    await admin.click('[data-to="closed"]');
-    await waitScreen(J.D, 'tunggu_cabutan', 10000);
-    assert((await J.D.textContent('.ticket-count')).trim() === '0', 'D bukan 0 tiket');
+  await step('3g. Tutup Soalan → semua tab kekal di Menunggu cabutan; jawab selepas tutup ditolak', async () => {
+    await admin.click('[data-to="closed"]'); await sleep(1000);
+    for (const k of ['A', 'B', 'C', 'D']) await waitScreen(J[k], 'tunggu_cabutan', 10000);
     const me = await meOf(J.D), c = await correct(), q = Object.keys(c)[0];
     assert((await rpc('gij_submit', { p_sid: sid, p_pid: me.participantId, p_secret: me.secret, p_answers: { [q]: c[q] } })).reason === 'closed', 'jawapan selepas tutup diterima');
   });
-  await step('3h. Token lama (>75 saat) ditolak sebagai tamat tempoh', async () => {
-    // tamat = akhir slot + 15s tenggang; tunggu sehingga 20s selepas itu
-    const expiresAt = (Number(earlyToken.split('-')[0]) + 1) * 60000 + 15000;
-    const wait = expiresAt + 20000 - (await serverNow()); // guna jam PELAYAN (jam komputer ujian mungkin tidak tepat)
-    if (wait > 0) { console.log(`     (menunggu ${Math.round(wait / 1000)}s untuk token tamat)`); await sleep(wait); }
-    assert((await rpc('gij_checkin', { p_sid: sid, p_token: earlyToken })).reason === 'expired', 'token lama diterima');
-  });
 
-  /* ---------- 4. Roda cabutan ---------- */
+  /* ---------- 4. Cabutan — pemenang ditentukan DI PELAYAN (gij_draw); setiap telefon papar animasi
+     ringkas sendiri (BUKAN roda besar disegerakkan, yang telah dibuang bersama #skrin). ---------- */
   const tabOf = async (pid) => { for (const k of Object.keys(J)) if ((await meOf(J[k]))?.participantId === pid) return k; return null; };
-  const winners = async () => (await snap()).winners.filter((w) => w.session_id === sid).sort((a, b) => a.order - b.order);
-  async function spinOnce(how) {
-    await skrin.waitForFunction(() => { const b = document.querySelector('#btnSpin'); return b && !b.disabled; }, null, { timeout: 15000 });
-    if (how === 'space') { await skrin.evaluate(() => document.activeElement?.blur()); await skrin.keyboard.press('Space'); } else await skrin.click('#btnSpin');
-    await sleep(1500);
-    const ws = await winners(), w = ws[ws.length - 1], k = await tabOf(w.participant_id);
-    assert(await screenOf(J[k]) !== 'tahniah', 'keputusan bocor sebelum roda berhenti');
-    await skrin.waitForSelector('.win-overlay', { timeout: 12000 });
-    const landed = await skrin.evaluate(() => document.querySelector('#wheel').dataset.landed);
-    assert(landed === w.participant_id, `roda (${landed}) ≠ pangkalan data (${w.participant_id})`);
-    await waitScreen(J[k], 'tahniah', 10000);
-    return { w, k };
-  }
   const wins = [];
-  await step('4a. Mulakan Cabutan → roda di skrin', async () => {
-    await admin.click('[data-to="drawing"]');
-    await skrin.waitForSelector('#wheel', { timeout: 10000 });
-    await skrin.waitForFunction(() => Skrin.segs.length === 3, null, { timeout: 5000 });
+  await step('4a. Mulakan Cabutan; kurangkan hadiah kepada 2 (drpd 3 tiket-pemegang) supaya ada "belum rezeki"', async () => {
+    await write([{ t: 'sessions', op: 'upsert', row: { id: sid, prizes: ['Sejadah', 'Al-Quran'] } }]);
+    assert((await setState(sid, 'drawing')).ok, 'tidak masuk "drawing"');
   });
-  await step('4b. Putaran 1 (gij_draw): roda = DB, keputusan ke telefon pemenang', async () => { wins.push(await spinOnce('click')); });
-  await step('4c. Putaran 2 (Space)', async () => { wins.push(await spinOnce('space')); });
-  await step('4d. Putaran 3; tiket kurang dari hadiah → berhenti', async () => {
-    wins.push(await spinOnce('click'));
-    assert(new Set(wins.map((x) => x.w.participant_id)).size === 3, 'pemenang berganda');
-    await skrin.waitForFunction(() => /Tiada lagi peserta layak/.test(document.querySelector('#drawMsg')?.textContent || ''), null, { timeout: 8000 });
-    assert((await rpc('gij_draw', { p_pin: PIN, p_sid: sid })).reason === 'nopool', 'cabutan tambahan dibenarkan');
-    await skrin.screenshot({ path: path.join(OUT, 'SB-roda.png') });
+  await step('4b. Cabutan pertama (gij_draw): keputusan TIDAK terus ke telefon pemenang', async () => {
+    const r = await rpc('gij_draw', { p_pin: PIN, p_sid: sid });
+    assert(r.ok, 'cabutan pertama gagal: ' + JSON.stringify(r));
+    const k = await tabOf(r.winner.participantId);
+    assert(await screenOf(J[k]) !== 'tahniah', 'keputusan bocor sebelum animasi tamat');
+    await waitScreen(J[k], 'tahniah', 12000);
+    wins.push({ k, w: r.winner });
   });
-  await step('4e. Tamatkan → D "Belum rezeki"; pemenang: poster + ringkasan', async () => {
-    await skrin.click('#btnFinish');
-    await waitScreen(J.D, 'belum', 10000);
-    for (const { k } of wins) { await waitScreen(J[k], 'tahniah'); await J[k].waitForSelector('#winPoster', { timeout: 8000 }); await J[k].waitForFunction(() => document.querySelectorAll('.points li').length >= 3, null, { timeout: 8000 }); }
-    await J.D.reload(); await waitScreen(J.D, 'belum');
+  await step('4c. Cabutan kedua: pemenang berbeza, tiada berganda', async () => {
+    const r = await rpc('gij_draw', { p_pin: PIN, p_sid: sid });
+    assert(r.ok, 'cabutan kedua gagal: ' + JSON.stringify(r));
+    assert(r.winner.participantId !== wins[0].w.participantId, 'pemenang sama dicabut dua kali');
+    const k = await tabOf(r.winner.participantId);
+    await waitScreen(J[k], 'tahniah', 12000);
+    wins.push({ k, w: r.winner });
+  });
+  await step('4d. Hadiah dihabiskan → cabutan seterusnya "noprize"', async () => {
+    assert((await rpc('gij_draw', { p_pin: PIN, p_sid: sid })).reason === 'noprize', 'cabutan tambahan selepas hadiah habis dibenarkan');
+  });
+  await step('4e. Tamatkan → D "Terima kasih kerana hadir" (0 tiket); baki pemegang tiket "Belum rezeki"; pemenang: poster + ringkasan', async () => {
+    assert((await setState(sid, 'done')).ok, 'tidak masuk "done"');
+    await waitScreen(J.D, 'belum_tiada', 10000);
+    for (const { k, w } of wins) { await waitScreen(J[k], 'tahniah'); await J[k].waitForSelector('#winPoster', { timeout: 8000 }); assert(await J[k].locator(`text=${w.prize}`).count() > 0, 'hadiah tidak dipapar'); }
+    const loserKeys = ['A', 'B', 'C'].filter((k) => !wins.some((x) => x.k === k));
+    for (const k of loserKeys) await waitScreen(J[k], 'belum_ada', 10000);
+    await J.D.reload(); await waitScreen(J.D, 'belum_tiada');
+  });
+  await step('4f. Muat Turun E-book (PDF): butang wujud & boleh diklik tanpa ralat', async () => {
+    for (const p of [J[wins[0].k], J.D]) {
+      const btn = p.locator('button:has-text("Muat Turun E-book")');
+      assert(await btn.count() === 1, 'butang e-book tiada');
+      await btn.click(); await sleep(500);
+    }
   });
 
   /* ---------- 5. Sesi 2: dikenali + privasi ---------- */
@@ -360,15 +373,18 @@ const meOf = (p) => p.evaluate(() => JSON.parse(localStorage.getItem('gij_me') |
     sid2 = s2.id;
     await write([0, 1, 2].map((i) => ({ t: 'questions', op: 'upsert', row: { id: `${sid2}_q${i}`, session_id: sid2, text: `Soalan ${i}?`, options: ['a', 'b', 'c', 'd'], correct_index: 0, status: 'lulus' } })));
     assert((await setState(sid2, 'registration')).ok, 'buka pendaftaran sesi 2');
-    const url = `${BASE}#j?s=${sid2}&t=${await token(sid2)}`;
+    const code2 = await joinCode(sid2);
+    const url = `${BASE}#j?s=${sid2}&t=${code2}`;
     await J.C.goto(url); await waitScreen(J.C, 'daftar');
     assert(await J.C.locator('#phone').count() === 0 && await J.C.locator('text=Selamat kembali').count() === 1, 'peranti C tidak dikenali');
-    await J.C.click('#btnHadir'); await waitScreen(J.C, 'tunggu_soalan');
+    await J.C.click('#btnHadir'); await sleep(500);
+    await J.C.waitForSelector('#btnTeruskan', { timeout: 8000 }); await J.C.click('#btnTeruskan');
+    await waitScreen(J.C, 'tunggu_soalan');
     assert(await J.C.locator('text=2 sesi berturut-turut').count() === 1, 'streak C tidak dipapar');
   });
   if (!SKIP_PRIVACY) {
     await step('5b. PRIVASI: peranti baharu + no. lama → nama bertopeng sahaja; nama salah ditolak; nama betul diterima', async () => {
-      const F = J.F = await device('jemaah-F', `${BASE}#j?s=${sid2}&t=${await token(sid2)}`);
+      const F = J.F = await device('jemaah-F', `${BASE}#j?s=${sid2}&t=${await joinCode(sid2)}`);
       await waitScreen(F, 'daftar');
       await F.fill('#phone', PHONE(1)); await F.click('#regForm button[type=submit]');
       await F.waitForSelector('#confName', { timeout: 8000 });
@@ -376,7 +392,8 @@ const meOf = (p) => p.evaluate(() => JSON.parse(localStorage.getItem('gij_me') |
       assert(!/Ahmad|Hafiz|Ha\*\*\*|Uj\*\*\*/.test(page) && (await F.textContent('#maskedName')).trim() === 'Ahm***', 'skrin mendedahkan lebih daripada nama pertama bertopeng: ' + page.slice(0, 160));
       await F.fill('#confName', 'Orang Lain'); await F.click('#regForm button[type=submit]'); await sleep(1500);
       assert(await F.locator('#fConf .error:not(.hidden)').count() === 1 && await screenOf(F) === 'daftar', 'nama salah diterima');
-      await F.fill('#confName', 'ahmad  hafiz BIN ujian'); await F.click('#regForm button[type=submit]');
+      await F.fill('#confName', 'ahmad  hafiz BIN ujian'); await F.click('#regForm button[type=submit]'); await sleep(500);
+      await F.waitForSelector('#btnTeruskan', { timeout: 8000 }); await F.click('#btnTeruskan');
       await waitScreen(F, 'tunggu_soalan');
       const d = await snap(), p = d.participants.filter((x) => x.phone === PHONE(1));
       assert(p.length === 1 && d.registrations.filter((r) => r.session_id === sid2 && r.participant_id === p[0].id).length === 1, 'rekod berganda');
@@ -386,14 +403,14 @@ const meOf = (p) => p.evaluate(() => JSON.parse(localStorage.getItem('gij_me') |
       assert(lk === 'Ahm***', 'gij_lookup (pelayan) mesti "Ahm***" sahaja, dapat: ' + JSON.stringify(lk) + ' — jalankan schema.sql terkini');
     });
     await step('5c. PRIVASI: 5 percubaan nama salah → dikunci sementara', async () => {
-      const tk = await token(sid2), ck = await rpc('gij_checkin', { p_sid: sid2, p_token: tk });
+      const code2 = await joinCode(sid2);
       let last;
-      for (let i = 0; i < 6; i++) last = await rpc('gij_register', { p_sid: sid2, p_ticket: ck.ticket, p_name: 'Salah ' + i, p_phone: PHONE(2), p_dist: null, p_secret: null });
+      for (let i = 0; i < 6; i++) last = await rpc('gij_register', { p_sid: sid2, p_ticket: code2, p_name: 'Salah ' + i, p_phone: PHONE(2), p_dist: null, p_secret: null });
       assert(last.reason === 'locked', 'tidak dikunci selepas 5 percubaan: ' + JSON.stringify(last));
-      const ok = await rpc('gij_register', { p_sid: sid2, p_ticket: ck.ticket, p_name: 'Siti Ujian binti Test', p_phone: PHONE(2), p_dist: null, p_secret: null });
+      const ok = await rpc('gij_register', { p_sid: sid2, p_ticket: code2, p_name: 'Siti Ujian binti Test', p_phone: PHONE(2), p_dist: null, p_secret: null });
       assert(ok.reason === 'locked', 'nama betul diterima semasa dikunci');
       const meB = await meOf(J.B);
-      const viaSecret = await rpc('gij_register', { p_sid: sid2, p_ticket: ck.ticket, p_name: '', p_phone: PHONE(2), p_dist: null, p_secret: meB.secret });
+      const viaSecret = await rpc('gij_register', { p_sid: sid2, p_ticket: code2, p_name: '', p_phone: PHONE(2), p_dist: null, p_secret: meB.secret });
       assert(viaSecret.ok, 'peranti asal (rahsia) disekat oleh kunci');
     });
   }
@@ -411,26 +428,24 @@ const meOf = (p) => p.evaluate(() => JSON.parse(localStorage.getItem('gij_me') |
         ...[0, 1, 2].map((k) => ({ t: 'questions', op: 'upsert', row: { id: `${id}_q${k}`, session_id: id, text: 'Q' + k, options: ['a', 'b', 'c', 'd'], correct_index: 0, status: 'lulus' } }))]);
       await setState(id, 'registration');
       if (i !== 3) {
-        const ck = await rpc('gij_checkin', { p_sid: id, p_token: await token(id) });
-        const r = await rpc('gij_register', { p_sid: id, p_ticket: ck.ticket, p_name: 'Pak Streak Ujian', p_phone: PHONE(9), p_dist: null, ...(SKIP_PRIVACY ? {} : { p_secret: res.secret || null }) });
+        const code = await joinCode(id);
+        const r = await rpc('gij_register', { p_sid: id, p_ticket: code, p_name: 'Pak Streak Ujian', p_phone: PHONE(9), p_dist: null, ...(SKIP_PRIVACY ? {} : { p_secret: res.secret || null }) });
         assert(r.ok, 'daftar streak gagal: ' + JSON.stringify(r)); res.pid = r.participantId; res.secret = r.secret;
         const v = await rpc('gij_jemaah_view', { p_sid: id, p_pid: r.participantId, p_secret: r.secret });
         res.push([v.streak, v.bonus]);
       } else res.push([0, 0]);
-      await setState(id, 'questions'); await setState(id, 'closed'); await setState(id, 'done');
+      await setState(id, 'prepared'); await setState(id, 'questions'); await setState(id, 'closed'); await setState(id, 'done');
     }
     void tid;
     assert(JSON.stringify(res.map((x) => x[0])) === '[1,2,3,0,1]', 'streak: ' + JSON.stringify(res));
     assert(JSON.stringify(res.map((x) => x[1])) === '[0,0,2,0,0]', 'bonus: ' + JSON.stringify(res));
   });
-  await step('7. Sesi tanpa peserta: tiada cabutan (pelayan & skrin)', async () => {
+  await step('7. Sesi tanpa peserta: tiada tiket, tiada cabutan (pelayan)', async () => {
     const id = 's_uji_kosong_' + Date.now().toString(36);
     await write([{ t: 'sessions', op: 'upsert', row: { id, title: TAG + ' Kosong', date: '2026-12-01', start_time: '10:00', end_time: '11:00', answer_minutes: 5, prizes: ['A'], summary: [], transcript: '' } },
       ...[0, 1, 2].map((k) => ({ t: 'questions', op: 'upsert', row: { id: `${id}_q${k}`, session_id: id, text: 'Q', options: ['a', 'b', 'c', 'd'], correct_index: 0, status: 'lulus' } }))]);
-    for (const st of ['registration', 'questions', 'closed', 'drawing']) assert((await setState(id, st)).ok, 'peralihan ' + st);
-    assert((await rpc('gij_draw', { p_pin: PIN, p_sid: id })).reason === 'nopool', 'cabutan dibenarkan');
-    await skrin.goto(`${BASE}#skrin?s=${id}`); await skrin.waitForSelector('#btnSpin', { timeout: 10000 });
-    assert(await skrin.locator('#btnSpin').isDisabled(), 'butang putar aktif');
+    for (const st of ['registration', 'prepared', 'questions', 'closed', 'drawing']) assert((await setState(id, st)).ok, 'peralihan ' + st);
+    assert((await rpc('gij_draw', { p_pin: PIN, p_sid: id })).reason === 'nopool', 'cabutan dibenarkan walaupun tiada peserta');
   });
   await step('8. Ranking, laporan & CSV dalam mod Supabase', async () => {
     await admin.goto(BASE + '#admin?tab=ranking'); await admin.waitForSelector('#rBody', { timeout: 10000 });

@@ -36,51 +36,72 @@ const s1 = await one(`select title, speaker, prizes from sessions where id='s1'`
 ok(s1.title === 'Tajuk Baharu' && s1.prizes.length === 3, 'upsert separa hanya ubah lajur yang dihantar');
 ok(/hanya boleh dipadam|tidak dibenarkan/.test(await rpcErr('gij_admin_write', '1234', JSON.stringify([{ t: 'participants', op: 'upsert', row: { id: 'x', name: 'x', phone: '0123456789' } }]))), 'jadual peserta tidak boleh ditulis terus');
 
-// Peralihan keadaan
-ok((await rpc('gij_set_state', '1234', 's1', 'questions')).ok === false, 'draf → soalan ditolak');
+// Peralihan keadaan — v5: draft -> registration -> prepared -> questions -> closed -> drawing -> done
+ok((await rpc('gij_set_state', '1234', 's1', 'questions')).ok === false, 'draf → soalan ditolak (mesti melalui pendaftaran & disediakan)');
 ok((await rpc('gij_set_state', '1234', 's1', 'registration')).ok === true, 'draf → pendaftaran diterima');
 ok(/dikunci/.test(await rpcErr('gij_admin_write', '1234', JSON.stringify([{ t: 'questions', op: 'upsert', row: { id: 's1_q0', text: 'x' } }]))) === false, 'soalan masih boleh disunting semasa pendaftaran');
 
-// ---------- Token & check-in ----------
-const tok = await rpc('gij_token', '1234', 's1');
-ok(/^\d+-[0-9a-f]{16}$/.test(tok), 'token dijana: ' + tok);
-const ck = await rpc('gij_checkin', 's1', tok);
-ok(ck.ok && ck.ticket, 'token aktif diterima');
-const slot = Number(tok.split('-')[0]);
-const oldTok = `${slot - 3}-` + (await one(`select public.gij__sign($1) as v`, [`s1|${slot - 3}`])).v;
-ok((await rpc('gij_checkin', 's1', oldTok)).reason === 'expired', 'token tamat tempoh ditolak');
-ok((await rpc('gij_checkin', 's1', `${slot}-deadbeefdeadbeef`)).reason === 'invalid', 'token palsu ditolak');
-ok((await rpc('gij_checkin', 's_lain', tok)).reason === 'notfound', 'token untuk sesi lain ditolak');
+// ---------- Kod sertai statik (QR bercetak) — v5, gantikan token/checkin dinamik 60s ----------
+ok(/PIN tidak sah/.test(await rpcErr('gij_join_code', '0000', 's1')), 'kod sertai tanpa PIN ditolak');
+const code = await rpc('gij_join_code', '1234', 's1');
+ok(/^[0-9a-f]{16}$/.test(code), 'kod sertai dijana (statik, tiada slot masa): ' + code);
+ok(code === (await rpc('gij_join_code', '1234', 's1')), 'kod sertai TETAP bagi sesi yang sama (bukan berputar setiap 60s)');
+ok(await rpc('gij__join_ok', 's1', code) === true, 'kod sertai sah untuk sesi sendiri');
+ok(await rpc('gij__join_ok', 's1', 'deadbeefdeadbeef') === false, 'kod palsu ditolak');
+ok(await rpc('gij__join_ok', 's_lain', code) === false, 'kod sesi ini tidak sah untuk sesi lain');
+ok(/does not exist/i.test(await rpcErr('gij_token', '1234', 's1') || ''), 'gij_token dibuang (v5, gantikan skrin besar)');
+ok(/does not exist/i.test(await rpcErr('gij_checkin', 's1', code) || ''), 'gij_checkin dibuang (v5)');
+
+// ---------- Semakan bilangan soalan (3-5) kini juga berlaku semasa masuk "prepared" ----------
+await W([{ t: 'sessions', op: 'upsert', row: { id: 's0', title: 'Sesi Kurang Soalan', date: '2026-09-05', prizes: ['A'] } },
+         { t: 'questions', op: 'upsert', row: { id: 's0_q0', session_id: 's0', text: 'Q?', options: ['a', 'b', 'c', 'd'], correct_index: 0, status: 'lulus' } }]);
+ok((await rpc('gij_set_state', '1234', 's0', 'registration')).ok === true, 's0: draf → pendaftaran diterima');
+ok(/Perlu 3.5 soalan/.test((await rpc('gij_set_state', '1234', 's0', 'prepared')).reason), 's0: 1 soalan lulus — tidak boleh masuk "prepared" (semakan kini di sini juga, bukan hanya di "questions")');
 
 // ---------- Pendaftaran ----------
-ok((await rpc('gij_register', 's1', 'palsu.123', 'Ali', '0127778888', null)).reason === 'expired', 'tiket check-in palsu ditolak');
-ok((await rpc('gij_register', 's1', ck.ticket, 'Ali', '12345', null)).reason === 'phone', 'telefon salah format ditolak');
-ok((await rpc('gij_register', 's1', ck.ticket, '  ', '0127778888', null)).reason === 'name', 'nama kosong ditolak');
-const r1 = await rpc('gij_register', 's1', ck.ticket, 'Ali  bin Abu', '0127778888', null);
+ok((await rpc('gij_register', 's1', 'kod-palsu', 'Ali', '0127778888', null)).reason === 'expired', 'kod sertai palsu ditolak');
+ok((await rpc('gij_register', 's1', code, 'Ali', '12345', null)).reason === 'phone', 'telefon salah format ditolak');
+ok((await rpc('gij_register', 's1', code, '  ', '0127778888', null)).reason === 'name', 'nama kosong ditolak');
+const r1 = await rpc('gij_register', 's1', code, 'Ali  bin Abu', '0127778888', null);
 ok(r1.ok && r1.name === 'Ali bin Abu' && r1.regNo === 1, 'pendaftaran baharu');
-const r1b = await rpc('gij_register', 's1', ck.ticket, '', '0127778888', null, r1.secret);
+const r1b = await rpc('gij_register', 's1', code, '', '0127778888', null, r1.secret);
 ok(r1b.ok && r1b.participantId === r1.participantId && (await one(`select count(*)::int n from registrations where session_id='s1'`)).n === 1, 'daftar semula dengan rahsia peranti: dikenali, tiada rekod berganda');
 // ---------- Privasi nombor telefon ----------
 ok(await rpc('gij_lookup', '0127778888') === 'A***', 'lookup: nama pertama bertopeng sahaja (tiada bin/nama bapa): ' + await rpc('gij_lookup', '0127778888'));
 ok((await one(`select public.gij__mask_name('Ahmad Hafiz bin Ali') v`)).v === 'Ahm***', 'format nama bertopeng: nama pertama sahaja');
-const nm = await rpc('gij_register', 's1', ck.ticket, 'Orang Lain', '0127778888', null, null);
+const nm = await rpc('gij_register', 's1', code, 'Orang Lain', '0127778888', null, null);
 ok(nm.ok === false && nm.reason === 'namemismatch' && nm.attemptsLeft === 4, 'peranti baharu + nama salah ditolak: ' + JSON.stringify(nm));
-ok((await rpc('gij_register', 's1', ck.ticket, '', '0127778888', null, 'rahsia-salah')).reason === 'namemismatch', 'rahsia salah + tiada nama ditolak');
-const nOk = await rpc('gij_register', 's1', ck.ticket, 'ALI  b. abu', '0127778888', null, null);
+ok((await rpc('gij_register', 's1', code, '', '0127778888', null, 'rahsia-salah')).reason === 'namemismatch', 'rahsia salah + tiada nama ditolak');
+const nOk = await rpc('gij_register', 's1', code, 'ALI  b. abu', '0127778888', null, null);
 ok(nOk.ok && nOk.participantId === r1.participantId, 'nama penuh bertoleransi (huruf besar/kecil, "b.") diterima');
 ok((await one(`select name_fails from participants where id=$1`, [r1.participantId])).name_fails === 0, 'kiraan cubaan ditetapkan semula selepas berjaya');
-let lk; for (let i = 0; i < 5; i++) lk = await rpc('gij_register', 's1', ck.ticket, 'Salah ' + i, '0127778888', null, null);
+let lk; for (let i = 0; i < 5; i++) lk = await rpc('gij_register', 's1', code, 'Salah ' + i, '0127778888', null, null);
 ok(lk.reason === 'locked', '5 cubaan salah → dikunci');
-ok((await rpc('gij_register', 's1', ck.ticket, 'Ali bin Abu', '0127778888', null, null)).reason === 'locked', 'nama betul pun ditolak semasa dikunci');
-ok((await rpc('gij_register', 's1', ck.ticket, '', '0127778888', null, r1.secret)).ok, 'peranti asal (rahsia) tidak terjejas oleh kunci');
+ok((await rpc('gij_register', 's1', code, 'Ali bin Abu', '0127778888', null, null)).reason === 'locked', 'nama betul pun ditolak semasa dikunci');
+ok((await rpc('gij_register', 's1', code, '', '0127778888', null, r1.secret)).ok, 'peranti asal (rahsia) tidak terjejas oleh kunci');
 await db.query(`update participants set locked_until = null where id = $1`, [r1.participantId]);
-const r2 = await rpc('gij_register', 's1', ck.ticket, 'Siti Aminah', '0139990000', null);
+const r2 = await rpc('gij_register', 's1', code, 'Siti Aminah', '0139990000', null);
+
+// ---------- Arahan tuntutan hadiah (prizeInstructions) & tahap kesukaran soalan (difficulty) ----------
+await W([{ t: 'sessions', op: 'upsert', row: { id: 's1', prize_instructions: 'Tunjukkan skrin kemenangan di kaunter AJK selepas solat.' } }]);
+ok((await rpc('gij_jemaah_view', 's1', r1.participantId, r1.secret)).session.prizeInstructions === 'Tunjukkan skrin kemenangan di kaunter AJK selepas solat.', 'gij_jemaah_view memulangkan prizeInstructions');
+await W([{ t: 'questions', op: 'upsert', row: { id: 's1_q0', difficulty: 'susah' } }]);
+ok((await one(`select difficulty from questions where id='s1_q0'`)).difficulty === 'susah', 'difficulty soalan boleh dikemas kini (mudah/sederhana/susah)');
+let diffErr = null;
+try { await db.query(`insert into questions (id, session_id, text, options, difficulty) values ('bad_q','s1','x','["a","b","c","d"]','tidaksah')`); }
+catch (e) { diffErr = e.message; }
+ok(/questions_difficulty_check|violates check constraint/i.test(diffErr || ''), 'difficulty tidak sah (bukan mudah/sederhana/susah) ditolak: ' + diffErr);
 
 // ---------- Paparan jemaah & jawapan ----------
 let v = await rpc('gij_jemaah_view', 's1', r1.participantId, r1.secret);
 ok(v.ok && v.registered && v.questions === null && v.tickets === null, 'paparan jemaah: menunggu soalan');
 ok((await rpc('gij_jemaah_view', 's1', r1.participantId, 'salah')).knownDevice === false, 'rahsia salah = peranti tidak dikenali');
 ok((await rpc('gij_submit', 's1', r1.participantId, r1.secret, '{}')).reason === 'closed', 'jawab sebelum soalan dibuka ditolak');
+ok((await rpc('gij_set_state', '1234', 's1', 'prepared')).ok, 's1: pendaftaran → disediakan (3 soalan lulus, diterima)');
+v = await rpc('gij_jemaah_view', 's1', r1.participantId, r1.secret);
+ok(v.session.state === 'prepared' && v.questions === null, 'jemaah tunggu soalan disediakan (skrin "bersedia")');
+ok(/dikunci/.test(await rpcErr('gij_admin_write', '1234', JSON.stringify([{ t: 'questions', op: 'upsert', row: { id: 's1_q0', text: 'y' } }]))), 'soalan dikunci semasa "prepared" (bukan lagi hanya semasa "questions")');
+ok((await rpc('gij_register', 's1', code, 'Sesiapa', '0161112222', null)).reason === 'closed', 'pendaftaran baharu ditutup semasa "prepared" (dahulu masih dibenarkan semasa "questions")');
 await rpc('gij_set_state', '1234', 's1', 'questions');
 v = await rpc('gij_jemaah_view', 's1', r1.participantId, r1.secret);
 ok(v.questions?.length === 3 && !JSON.stringify(v.questions).includes('correct'), 'soalan dihantar TANPA jawapan betul');
@@ -135,14 +156,17 @@ for (const id of ['t1a', 't1b']) await db.query(`insert into registrations (id, 
 ok((await one(`select public.gij__streak_at($1,'t1a') a, public.gij__streak_at($1,'t1b') b`, [pid])).b === (await one(`select public.gij__streak_at($1,'t1a') a`, [pid])).a + 1, 'sesi sama tarikh/masa: streak ikut created_at');
 
 // ---------- Padam peserta (PDPA) ----------
-const tmp = await rpc('gij_register', 's1', ck.ticket, 'Peserta Padam', '0161234567', null, null);
-await W([{ t: 'participants', op: 'delete', id: tmp.participantId }]);
-ok((await one(`select count(*)::int n from participants where id=$1`, [tmp.participantId])).n === 0 && (await one(`select count(*)::int n from registrations where participant_id=$1`, [tmp.participantId])).n === 0, 'padam peserta + rekod berkaitan');
+// s1 sudah lepas "registration" pada ketika ini — masuk terus melalui SQL (bukan gij_register) untuk ujian padam.
+const tmpId = (await one(`select public.gij__uid('p_') as v`)).v;
+await db.query(`insert into participants (id, name, phone) values ($1, 'Peserta Padam', '0161234567')`, [tmpId]);
+await db.query(`insert into registrations (id, session_id, participant_id, reg_no) values ($1, 's1', $2, 99)`, ['r_padam', tmpId]);
+await W([{ t: 'participants', op: 'delete', id: tmpId }]);
+ok((await one(`select count(*)::int n from participants where id=$1`, [tmpId])).n === 0 && (await one(`select count(*)::int n from registrations where participant_id=$1`, [tmpId])).n === 0, 'padam peserta + rekod berkaitan');
 ok(/hanya boleh dipadam/.test(await rpcErr('gij_admin_write', '1234', JSON.stringify([{ t: 'participants', op: 'upsert', row: { id: 'x' } }]))), 'peserta tidak boleh diubah terus');
 
 // ---------- Sesi tanpa peserta ----------
 await mkSession('e1', '2026-11-01');
-await rpc('gij_set_state', '1234', 'e1', 'registration'); await rpc('gij_set_state', '1234', 'e1', 'questions');
+await rpc('gij_set_state', '1234', 'e1', 'registration'); await rpc('gij_set_state', '1234', 'e1', 'prepared'); await rpc('gij_set_state', '1234', 'e1', 'questions');
 await rpc('gij_set_state', '1234', 'e1', 'closed'); await rpc('gij_set_state', '1234', 'e1', 'drawing');
 ok((await rpc('gij_draw', '1234', 'e1')).reason === 'nopool', 'sesi tanpa peserta: tiada cabutan');
 
