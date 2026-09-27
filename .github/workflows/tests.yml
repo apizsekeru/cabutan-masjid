@@ -96,10 +96,5 @@ jobs:
       - name: Papar ekor ralat sebagai annotation (jika gagal)
         if: failure()
         run: |
-          MSG=$(tail -c 6000 /tmp/e2e-output.log | python3 -c "
-import sys
-t = sys.stdin.read()
-t = t.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
-print(t)
-")
+          MSG=$(python3 -c "t=open('/tmp/e2e-output.log','rb').read()[-6000:].decode('utf-8','replace'); print(t.replace('%','%25').replace(chr(13),'%0D').replace(chr(10),'%0A'))")
           echo "::error title=Kegagalan e2e-supabase::$MSG"
