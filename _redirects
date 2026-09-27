@@ -1,0 +1,9 @@
+# Netlify menerbitkan SELURUH repo git (kita guna publish = ".").
+# Halang fail sumber/ujian daripada dimuat turun terus oleh orang awam.
+# "!" paksa peraturan ini walaupun fail sebenar wujud pada laluan itu.
+/tests/*                     /  404!
+/schema.sql                  /  404!
+/SEMAKAN_PRA_PELANCARAN.md   /  404!
+/.github/*                   /  404!
+/supabase/*                  /  404!
+/.gitignore                  /  404!
