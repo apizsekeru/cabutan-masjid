@@ -90,16 +90,16 @@ jobs:
           set -o pipefail
           node e2e.js 2>&1 | tee /tmp/e2e-output.log
 
-      # api.github.com sahaja boleh dicapai dari luar CI (bukan storan
-      # blob log runner), jadi bila gagal, hantar ekor log ke Gist
-      # peribadi supaya boleh dibaca terus melalui API.
-      - name: Muat naik log ralat ke Gist (jika gagal)
+      # Storan log penuh (blob.core.windows.net) tak boleh dicapai dari luar
+      # CI. "::error::" mencipta annotation pada check-run, yang BOLEH dibaca
+      # semula melalui api.github.com/repos/.../check-runs/{id}/annotations.
+      - name: Papar ekor ralat sebagai annotation (jika gagal)
         if: failure()
         run: |
-          TAIL=$(tail -c 55000 /tmp/e2e-output.log | python3 -c "import json,sys; print(json.dumps(sys.stdin.read()))")
-          BODY=$(printf '{"description":"Log ralat e2e-supabase - run %s","public":false,"files":{"e2e-output.log":{"content":%s}}}' "${{ github.run_id }}" "$TAIL")
-          RESP=$(curl -sS -X POST https://api.github.com/gists \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github+json" \
-            -d "$BODY")
-          echo "$RESP" | python3 -c "import json,sys; d=json.load(sys.stdin); print('GIST_URL:', d.get('html_url'), d.get('url'))"
+          MSG=$(tail -c 6000 /tmp/e2e-output.log | python3 -c "
+import sys
+t = sys.stdin.read()
+t = t.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+print(t)
+")
+          echo "::error title=Kegagalan e2e-supabase::$MSG"
