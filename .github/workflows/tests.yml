@@ -1,0 +1,89 @@
+name: Ujian Ganjaran Ilmu Jemaah Masjid
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      run_supabase_live:
+        description: "Jalankan juga ujian Supabase SEBENAR (cipta/padam data ujian di pangkalan data produksi)"
+        type: boolean
+        default: false
+
+jobs:
+  # ---------------------------------------------------------------
+  # Sentiasa jalan: ujian SQL (PGlite, tempatan, tiada internet luar)
+  # dan ujian mod demo (Playwright + pelayan HTTP tempatan sahaja).
+  # Selamat jalan automatik setiap push kerana tiada data luar disentuh.
+  # ---------------------------------------------------------------
+  sql-and-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Pasang pakej ujian
+        working-directory: tests
+        run: npm install
+
+      - name: Pasang Chromium untuk Playwright
+        run: npx --yes playwright@1.63.0 install --with-deps chromium
+
+      - name: Cari laluan Chromium yang dipasang
+        id: chrome
+        run: |
+          P=$(find "$HOME/.cache/ms-playwright" -type f -name chrome -path "*chrome-linux*" | head -n1)
+          echo "path=$P" >> "$GITHUB_OUTPUT"
+
+      - name: Ujian SQL (PGlite)
+        working-directory: tests
+        run: node sql.test.mjs
+
+      - name: Ujian E2E mod demo (Playwright)
+        working-directory: tests
+        env:
+          EXECUTABLE_PATH: ${{ steps.chrome.outputs.path }}
+        run: node e2e.js
+
+  # ---------------------------------------------------------------
+  # Jalan HANYA bila digerakkan secara manual dengan run_supabase_live
+  # dicentang. Ia menyentuh pangkalan data Supabase SEBENAR (data ujian
+  # ditanda [UJIAN E2E] / 019900xxxx dan dipadam automatik).
+  # Perlukan secret repo: GIJ_PIN (PIN AJK semasa).
+  # ---------------------------------------------------------------
+  supabase-live:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_supabase_live }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Pasang pakej ujian
+        working-directory: tests
+        run: npm install
+
+      - name: Pasang Chromium untuk Playwright
+        run: npx --yes playwright@1.63.0 install --with-deps chromium
+
+      - name: Cari laluan Chromium yang dipasang
+        id: chrome
+        run: |
+          P=$(find "$HOME/.cache/ms-playwright" -type f -name chrome -path "*chrome-linux*" | head -n1)
+          echo "path=$P" >> "$GITHUB_OUTPUT"
+
+      - name: Ujian E2E mod Supabase (laman sebenar)
+        working-directory: tests
+        env:
+          MODE: supabase
+          GIJ_PIN: ${{ secrets.GIJ_PIN }}
+          BASE_URL: ${{ vars.BASE_URL }}
+          EXECUTABLE_PATH: ${{ steps.chrome.outputs.path }}
+        run: node e2e.js
