@@ -433,6 +433,14 @@ begin
   return gij__sign('reg|' || p_sid);
 end $$;
 
+-- Semakan AWAM (tiada PIN) sama ada kod sertai dalam pautan QR sah untuk sesi ini —
+-- membolehkan jemaah nampak mesej "kod tidak sah" SEBELUM isi borang, tanpa
+-- mendedahkan rahsia gij__sign kepada pelayar (pulangkan boolean sahaja).
+create or replace function public.gij_join_check(p_sid text, p_code text) returns boolean
+language sql stable security definer set search_path = public, extensions as $$
+  select gij__join_ok(p_sid, p_code)
+$$;
+
 -- Cabutan: pemenang dipilih DI PELAYAN (rawak kriptografi, berpemberat tiket)
 create or replace function public.gij_draw(p_pin text, p_sid text) returns jsonb
 language plpgsql volatile security definer set search_path = public, extensions as $$
@@ -527,11 +535,13 @@ begin
     return jsonb_build_object('ok', false, 'reason', 'unverified');
   end if;
   select * into s from sessions where id = p_sid for update;
-  if exists (select 1 from answers where session_id = p_sid and participant_id = p_pid) then
-    return jsonb_build_object('ok', false, 'reason', 'duplicate');
-  end if;
+  -- Semak "ditutup" DAHULU: jika soalan sudah tutup, itulah sebab sebenar jawapan
+  -- ditolak — walaupun kebetulan turut sudah dijawab (elak mesej "duplicate" yang mengelirukan).
   if s.state <> 'questions' or s.questions_close_at is null or clock_timestamp() > s.questions_close_at + interval '5 seconds' then
     return jsonb_build_object('ok', false, 'reason', 'closed');
+  end if;
+  if exists (select 1 from answers where session_id = p_sid and participant_id = p_pid) then
+    return jsonb_build_object('ok', false, 'reason', 'duplicate');
   end if;
   for q in select * from questions where session_id = p_sid and status = 'lulus' loop
     if coalesce(p_answers->>q.id, '') ~ '^[0-3]$' then
@@ -604,6 +614,7 @@ revoke execute on all functions in schema public from public, anon, authenticate
 grant execute on function
   public.gij_admin_check(text), public.gij_admin_snapshot(text), public.gij_admin_write(text, jsonb),
   public.gij_set_state(text, text, text), public.gij_join_code(text, text), public.gij_draw(text, text),
+  public.gij_join_check(text, text),
   public.gij_lookup(text), public.gij_register(text, text, text, text, int, text),
   public.gij_submit(text, text, text, jsonb), public.gij_jemaah_view(text, text, text)
 to anon, authenticated;

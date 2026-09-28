@@ -771,18 +771,8 @@ const JoinCode = {
   sign(secret, msg) { return (hashPin(`${secret}|${msg}`) + hashPin(`${msg}|${secret}`)).slice(0, 12); },
   /** Setara gij_join_code(p_pin, p_sid): kod tetap bagi satu sesi. */
   forSession(secret, sid) { return this.sign(secret, 'reg|' + sid); },
-  /** Setara gij__join_ok(p_sid, p_code). */
+  /** Setara gij__join_ok(p_sid, p_code). Pengesahan sebenar: LocalAPI.joinCheck/SupaAPI.joinCheck (async, guna pelayan). */
   ok(secret, sid, code) { return !!code && code === this.forSession(secret, sid); },
-  /**
-   * Semakan PANTAS di PELAYAR (UX sahaja, BUKAN sempadan keselamatan — gij_register/LocalAPI.register
-   * di pelayan tetap menyemak semula). Dalam mod demo, rahsia sesi boleh dibaca terus daripada
-   * localStorage (pelayar = "pelayan"). Dalam mod Supabase, rahsia tidak sampai ke pelayar, jadi
-   * biarkan pengesahan sebenar berlaku semasa hantar pendaftaran ke gij_register.
-   */
-  checkClientSide(sid, code) {
-    if (MODE !== 'demo') return !!code;
-    return this.ok(LocalAPI.read().settings.tokenSecret, sid, code);
-  },
 };
 
 /* =====================================================================
@@ -914,6 +904,8 @@ const LocalAPI = {
   },
   /** Kod sertai statik (setara gij_join_code) — dibenamkan dalam pautan QR bercetak. */
   async joinCode(sid) { return JoinCode.forSession(this.read().settings.tokenSecret, sid); },
+  /** Semakan AWAM kod sertai (setara gij_join_check) — sebelum borang pendaftaran dipaparkan. */
+  async joinCheck(sid, code) { return JoinCode.ok(this.read().settings.tokenSecret, sid, code); },
   /** Cabutan: pemenang ditentukan DAHULU (rawak adil ikut tiket) → roda berhenti padanya. */
   async draw(sid) {
     return this.tx((d) => {
@@ -1031,6 +1023,7 @@ const SupaAPI = {
   },
   async setState(sid, to) { return this.rpc('gij_set_state', { p_pin: this.pin(), p_sid: sid, p_state: to }); },
   async joinCode(sid) { return this.rpc('gij_join_code', { p_pin: this.pin(), p_sid: sid }); },
+  async joinCheck(sid, code) { return !!(await this.rpc('gij_join_check', { p_sid: sid, p_code: code })); },
   async draw(sid) { return this.rpc('gij_draw', { p_pin: this.pin(), p_sid: sid }); },
   // Lapisan tambahan: papar perkataan pertama sahaja walaupun pelayan memulangkan lebih
   async lookup(phone) { const n = await this.rpc('gij_lookup', { p_phone: phone }); return n ? { masked: String(n).split(' ')[0] } : null; },
@@ -1839,10 +1832,11 @@ Views.j = async (app, params) => {
     LS.set(K.current, params.s);
     const clean = location.pathname + location.search + '#j';
     if (params.t) {
-      // Kod sertai STATIK — sah selagi sesi berstatus 'registration', tiada round-trip RPC diperlukan.
-      // Semakan di sini adalah untuk UX pantas sahaja; gij_register/LocalAPI.register di pelayan
-      // tetap menyemak semula (pertahanan berganda).
-      if (JoinCode.checkClientSide(params.s, params.t)) { LS.set(K.checkin, { sid: params.s, code: params.t }); J.flash = null; }
+      // Kod sertai STATIK — sah selagi sesi berstatus 'registration'. Disahkan di pelayan
+      // (gij_join_check/LocalAPI.joinCheck) supaya kod salah/lapuk ditolak SEBELUM borang
+      // pendaftaran dipaparkan; gij_register di pelayan tetap menyemak semula (pertahanan berganda).
+      const okCode = await API.joinCheck(params.s, params.t).catch(() => false);
+      if (okCode) { LS.set(K.checkin, { sid: params.s, code: params.t }); J.flash = null; }
       else J.flash = 'invalidcode';
     }
     // Pautan "kembali" daripada poster pendaftaran (WhatsApp): pid+sec mengenali semula peranti
