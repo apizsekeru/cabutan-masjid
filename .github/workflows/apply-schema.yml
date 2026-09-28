@@ -1,0 +1,43 @@
+name: Apply Skema ke Supabase
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  apply-schema:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pasang psql
+        run: sudo apt-get update -y && sudo apt-get install -y --no-install-recommends postgresql-client
+
+      - name: Apply schema.sql ke Supabase
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -o pipefail
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error title=Secret SUPABASE_DB_URL tiada::Sila tambah secret repo bernama SUPABASE_DB_URL (connection string Supabase, mod Transaction pooler)."
+            exit 1
+          fi
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f schema.sql 2>&1 | tee /tmp/apply-output.log
+
+      - name: Muat semula cache skema PostgREST
+        if: success()
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: psql "$DATABASE_URL" -c "NOTIFY pgrst, 'reload schema';"
+
+      - name: Sahkan fungsi RPC terkini wujud
+        if: success()
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          psql "$DATABASE_URL" -c "select proname from pg_proc where proname in ('gij_join_code','gij__join_ok','gij_token','gij_checkin') order by proname;"
+
+      - name: Papar ekor ralat sebagai annotation (jika gagal)
+        if: failure()
+        run: |
+          MSG=$(python3 -c "import os; p='/tmp/apply-output.log'; t=open(p,'rb').read()[-6000:].decode('utf-8','replace') if os.path.exists(p) else 'Tiada log (gagal sebelum psql sempat jalan - semak secret SUPABASE_DB_URL).'; print(t.replace('%','%25').replace(chr(13),'%0D').replace(chr(10),'%0A'))")
+          echo "::error title=Kegagalan apply schema::$MSG"
